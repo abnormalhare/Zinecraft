@@ -76,13 +76,13 @@ pub const LevelRenderer = struct {
         return self;
     }
 
-    pub fn render(self: *LevelRenderer, player: *Player, layer: i32) void {
+    pub fn render(self: *LevelRenderer, player: *Player, layer: i32) !void {
         ChunkFile.rebuilt_this_frame = 0;
         const frustum: *Frustum = Frustum.get_frustum();
 
         for (self.chunks) |*chunk| {
             if (frustum.cube_in_frustum_aabb(chunk.aabb)) {
-                chunk.render(layer);
+                try chunk.render(layer);
             }
         }
 

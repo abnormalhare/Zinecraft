@@ -122,8 +122,8 @@ pub const Level = struct {
             for (y0s..(y0s + y1s)) |z| {
                 const width = @as(usize, @intCast(self.width));
                 const old_depth = self.light_depths[z * width + x];
-                var y: usize = @intCast(self.depth - 1);
 
+                var y: usize = @intCast(self.depth - 1);
                 while (y > 0) : (y -= 1) {
                     if (self.is_light_blocker(@intCast(x), @intCast(y), @intCast(z))) {
                         break;

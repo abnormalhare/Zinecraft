@@ -4,14 +4,17 @@ const glfw = @import("glfw");
 const gl = @import("gl");
 const stbi = @import("stbi");
 
-const HitResult = @import("hit_result.zig").HitResult;
+const Cube = @import("character/cube.zig").Cube;
+const Zombie = @import("character/zombie.zig").Zombie;
+
+const ChunkFile = @import("level/chunk.zig");
 const Level = @import("level/level.zig").Level;
 const LevelRenderer = @import("level/level_renderer.zig").LevelRenderer;
-const Timer = @import("timer.zig").Timer;
-const Player = @import("player.zig").Player;
 
+const Player = @import("player.zig").Player;
+const HitResult = @import("hit_result.zig").HitResult;
+const Timer = @import("timer.zig").Timer;
 const Textures = @import("textures.zig");
-const ChunkFile = @import("level/chunk.zig");
 
 const FULLSCREEN_MODE: bool = false;
 
@@ -23,6 +26,7 @@ var timer: Timer = undefined;
 var level: Level = undefined;
 var level_renderer: *LevelRenderer = undefined;
 var player: Player = undefined;
+var zombies: std.ArrayList(Zombie) = .empty;
 
 var viewport_buffer: [16]i32 = [_]i32{0} ** 16;
 var select_buffer: [2000]u32 = [_]u32{0} ** 2000;
@@ -100,6 +104,10 @@ pub fn init(alloc: std.mem.Allocator, io: std.Io) !void {
 
     try glfw.setInputMode(window, .cursor, .disabled);
     glfw.getCursorPos(window, &last_x, &last_y);
+
+    for (0..100) |_| {
+        try zombies.append(alloc, Zombie.new(&level, &rand, 128.0, 0.0, 128.0));
+    }
 }
 
 pub fn destroy() void {
@@ -130,7 +138,7 @@ pub fn run(alloc: std.mem.Allocator, io: std.Io) !void {
             try tick();
         }
 
-        render(io, timer.a);
+        try render(io, timer.a);
         frames += 1;
 
         while (std.Io.Clock.now(.real, io).toMilliseconds() >= last_time + 1000) {
@@ -143,17 +151,24 @@ pub fn run(alloc: std.mem.Allocator, io: std.Io) !void {
 }
 
 pub fn tick() !void {
-    try player.tick(window, std.heap.page_allocator, &rand);
+    const alloc = std.heap.page_allocator;
+
+    for (zombies.items) |*zombie| {
+        try zombie.tick(alloc, &rand);
+    }
+    try player.tick(window, alloc, &rand);
 }
 
 fn move_camera_to_player(a: f32) void {
-    gl.glTranslatef(0.0, 0.0, -0.3);
-    gl.glRotatef(player.x_rot, 1.0, 0.0, 0.0);
-    gl.glRotatef(player.y_rot, 0.0, 1.0, 0.0);
+    const entity = player.entity;
 
-    const x: f32 = player.xo + (player.x - player.xo) * a;
-    const y: f32 = player.yo + (player.y - player.yo) * a;
-    const z: f32 = player.zo + (player.z - player.zo) * a;
+    gl.glTranslatef(0.0, 0.0, -0.3);
+    gl.glRotatef(entity.x_rot, 1.0, 0.0, 0.0);
+    gl.glRotatef(entity.y_rot, 0.0, 1.0, 0.0);
+
+    const x: f32 = entity.xo + (entity.x - entity.xo) * a;
+    const y: f32 = entity.yo + (entity.y - entity.yo) * a;
+    const z: f32 = entity.zo + (entity.z - entity.zo) * a;
     gl.glTranslatef(-x, -y, -z);
 }
 
@@ -194,14 +209,16 @@ fn pick(a: f32) void {
     setup_pick_camera(a, @divFloor(width, 2), @divFloor(height, 2));
     level_renderer.pick(&player);
 
-    const hits: usize = @intCast(gl.glRenderMode(gl.GL_RENDER));
+    const hits: i32 = @intCast(gl.glRenderMode(gl.GL_RENDER));
 
     var closest: i64 = 0;
     var names: [10]i32 = [_]i32{0} ** 10;
     var hit_name_count: i32 = 0;
 
+    // std.debug.print("hits: {}\n", .{hits});
+
     var idx: usize = 0;
-    for (0..hits) |i| {
+    for (0..@intCast(hits)) |i| {
         const name_count = select_buffer[idx];
         idx += 1;
 
@@ -272,7 +289,7 @@ fn key_callback(awindow: *glfw.Window, key: glfw.Key, scancode: i32, action: glf
 var last_x: f64 = 0;
 var last_y: f64 = 0;
 
-pub fn render(io: std.Io, a: f32) void {
+pub fn render(io: std.Io, a: f32) !void {
     var x: f64 = undefined;
     var y: f64 = undefined;
     glfw.getCursorPos(window, &x, &y);
@@ -281,6 +298,7 @@ pub fn render(io: std.Io, a: f32) void {
     const yo: f32 = @floatCast(y - last_y);
 
     player.turn(xo, yo);
+
     last_x = x;
     last_y = y;
     pick(a);
@@ -299,15 +317,21 @@ pub fn render(io: std.Io, a: f32) void {
     gl.glFogfv(gl.GL_FOG_COLOR, &fog_color);
     gl.glDisable(gl.GL_FOG);
 
-    level_renderer.render(&player, 0);
+    try level_renderer.render(&player, 0);
+
+    for (zombies.items) |*zombie| {
+        try zombie.render(io, a);
+    }
 
     gl.glEnable(gl.GL_FOG);
-    level_renderer.render(&player, 1);
+    try level_renderer.render(&player, 1);
 
     gl.glDisable(gl.GL_TEXTURE_2D);
     if (hit_result != null) {
         level_renderer.render_hit(io, hit_result.?);
     }
+
+    _ = Cube.new(0, 0);
 
     gl.glDisable(gl.GL_FOG);
     glfw.pollEvents();
