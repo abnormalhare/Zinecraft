@@ -91,7 +91,7 @@ pub const LevelRenderer = struct {
 
     pub fn pick(self: *LevelRenderer, player: *Player) void {
         const r: f32 = 3.0;
-        const box: AABB = player.entity.bb.grow(r, r, r);
+        const box: AABB = player.bb.grow(r, r, r);
 
         const x0: i32 = @intFromFloat(box.x0);
         const x1: i32 = @intFromFloat(box.x1 + 1);
