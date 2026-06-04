@@ -1,4 +1,4 @@
-# Minecraft Zig
+# Zinecraft 
 A direct port of Minecraft from Java to Zig. This project was completely stopped back when Zig 0.11.0 was the latest version in favor of using C++. I got stuck somewhere while debugging And dropped it.
 
 ### Usage
