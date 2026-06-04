@@ -3,4 +3,4 @@ zig-pkg/
 zig-out/
 .zed/
 level.dat
-terrain.png
+*.png
