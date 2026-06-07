@@ -35,9 +35,9 @@ pub const LevelRenderer = struct {
             .level = level,
             .chunks = undefined,
 
-            .x_chunks = @divFloor(level.width, 16),
-            .y_chunks = @divFloor(level.depth, 16),
-            .z_chunks = @divFloor(level.height, 16),
+            .x_chunks = @divTrunc(level.width, 16),
+            .y_chunks = @divTrunc(level.depth, 16),
+            .z_chunks = @divTrunc(level.height, 16),
 
             .t = try Tesselator.new(alloc),
         };
@@ -74,6 +74,11 @@ pub const LevelRenderer = struct {
         }
 
         return self;
+    }
+
+    pub fn deinit(self: *LevelRenderer, alloc: std.mem.Allocator) void {
+        alloc.free(self.chunks);
+        self.t.deinit(alloc);
     }
 
     pub fn render(self: *LevelRenderer, player: *Player, layer: i32) !void {
@@ -160,18 +165,18 @@ pub const LevelRenderer = struct {
     }
 
     pub fn set_dirty(self: *LevelRenderer, x0: i32, y0: i32, z0: i32, x1: i32, y1: i32, z1: i32) void {
-        const x0n: i32 = if (x0 < 0) 0 else @intCast(@divFloor(x0, 16));
-        const x1n: i32 = if (x1 >= self.x_chunks) @intCast(self.x_chunks - 1) else @intCast(@divFloor(x1, 16));
-        const y0n: i32 = if (y0 < 0) 0 else @intCast(@divFloor(y0, 16));
-        const y1n: i32 = if (y1 >= self.y_chunks) @intCast(self.y_chunks - 1) else @intCast(@divFloor(y1, 16));
-        const z0n: i32 = if (z0 < 0) 0 else @intCast(@divFloor(z0, 16));
-        const z1n: i32 = if (z1 >= self.z_chunks) @intCast(self.z_chunks - 1) else @intCast(@divFloor(z1, 16));
+        const x0n: i32 = if (x0 < 0) 0 else @intCast(@divTrunc(x0, 16));
+        const x1n: i32 = if (x1 >= self.x_chunks) @intCast(self.x_chunks - 1) else @intCast(@divTrunc(x1, 16));
+        const y0n: i32 = if (y0 < 0) 0 else @intCast(@divTrunc(y0, 16));
+        const y1n: i32 = if (y1 >= self.y_chunks) @intCast(self.y_chunks - 1) else @intCast(@divTrunc(y1, 16));
+        const z0n: i32 = if (z0 < 0) 0 else @intCast(@divTrunc(z0, 16));
+        const z1n: i32 = if (z1 >= self.z_chunks) @intCast(self.z_chunks - 1) else @intCast(@divTrunc(z1, 16));
 
         var x: i32 = x0n;
-        var y: i32 = y0n;
-        var z: i32 = z0n;
         while (x <= x1n) : (x += 1) {
+            var y: i32 = y0n;
             while (y <= y1n) : (y += 1) {
+                var z: i32 = z0n;
                 while (z <= z1n) : (z += 1) {
                     const idx: usize = @intCast((y * self.x_chunks + x) * self.z_chunks + z);
                     self.chunks[idx].set_dirty();

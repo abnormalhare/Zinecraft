@@ -53,6 +53,13 @@ pub const Level = struct {
         return self;
     }
 
+    pub fn deinit(self: *Level, alloc: std.mem.Allocator) void {
+        self.level_listeners.deinit(self.level_alloc);
+
+        alloc.free(self.light_depths);
+        alloc.free(self.blocks);
+    }
+
     pub fn load(self: *Level) !void {
         var io_thread: std.Io.Threaded = .init_single_threaded;
         const io = io_thread.io();

@@ -95,17 +95,24 @@ pub fn init(alloc: std.mem.Allocator, io: std.Io) !void {
     gl.glMatrixMode(gl.GL_MODELVIEW);
 
     level = try .new(alloc, std.heap.page_allocator, 256, 256, 64);
-    level_renderer = try LevelRenderer.new(alloc, &level);
+    level_renderer = try .new(alloc, &level);
     player = .new(&level, &rand);
 
     try glfw.setInputMode(window, .cursor, .disabled);
     glfw.getCursorPos(window, &last_x, &last_y);
 }
 
-pub fn destroy() void {
+pub fn destroy(alloc: std.mem.Allocator) void {
     level.save() catch {
         std.debug.print("OH NO! Could not save level!\n", .{});
     };
+
+    level_renderer.deinit(alloc);
+    alloc.destroy(level_renderer);
+
+    level.deinit(alloc);
+
+    ChunkFile.deinit(alloc);
 
     stbi.deinit();
     cursor.destroy();
@@ -118,7 +125,7 @@ pub fn run(alloc: std.mem.Allocator, io: std.Io) !void {
         std.debug.print("Failed to start RubyDung\n", .{});
         std.process.exit(0);
     };
-    defer destroy();
+    defer destroy(alloc);
 
     var last_time = std.Io.Clock.now(.real, io).toMilliseconds();
     var frames: i32 = 0;
@@ -191,7 +198,7 @@ fn pick(a: f32) void {
     gl.glSelectBuffer(2000, &select_buffer);
     _ = gl.glRenderMode(gl.GL_SELECT);
 
-    setup_pick_camera(a, @divFloor(width, 2), @divFloor(height, 2));
+    setup_pick_camera(a, @divTrunc(width, 2), @divTrunc(height, 2));
     level_renderer.pick(&player);
 
     const hits: usize = @intCast(gl.glRenderMode(gl.GL_RENDER));

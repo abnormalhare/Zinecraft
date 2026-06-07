@@ -128,9 +128,11 @@ pub const Player = struct {
         }
     }
 
+    // alloc is contained, no extra memory leaves this function
     pub fn move(self: *Player, alloc: std.mem.Allocator, xa: f32, ya: f32, za: f32) !void {
         var c = self.bb.expand(xa, ya, za);
-        const aABBs = try self.level.get_cubes(alloc, &c);
+        var aABBs = try self.level.get_cubes(alloc, &c);
+        defer aABBs.deinit(alloc);
 
         var nya: f32 = ya;
         var nxa: f32 = xa;

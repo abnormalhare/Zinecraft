@@ -18,6 +18,10 @@ pub fn init(alloc: std.mem.Allocator) !void {
     t = try Tesselator.new(alloc);
 }
 
+pub fn deinit(alloc: std.mem.Allocator) void {
+    t.deinit(alloc);
+}
+
 pub const Chunk = struct {
     aabb: AABB,
     level: *Level,

@@ -72,6 +72,12 @@ pub const Tesselator = struct {
         };
     }
 
+    pub fn deinit(self: *Tesselator, alloc: std.mem.Allocator) void {
+        alloc.free(self.vertex_buffer);
+        alloc.free(self.tex_coord_buffer);
+        alloc.free(self.color_buffer);
+    }
+
     pub fn tex(self: *Tesselator, u: f32, v: f32) void {
         self.has_texture = true;
         self.u = u;
