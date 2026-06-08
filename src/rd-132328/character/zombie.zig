@@ -112,7 +112,7 @@ pub const Zombie = struct {
 
         if (entity.on_ground) {
             entity.xd *= 0.8;
-            entity.yd *= 0.8;
+            entity.zd *= 0.8;
         }
     }
 
