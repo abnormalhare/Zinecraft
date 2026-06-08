@@ -7,5 +7,10 @@ This is intended to have as many Minecraft versions as possible. When building t
 zig build -Dversion={version}
 ```
 
+### AI Disclaimer
+While the initial port of all code is hand-written by me, occasionally I will use AI to compare the port with the original and see if I made any mistakes. It's not always very good at it so I try to not rely on it lol.
+
 ### Currently Available Versions
 rd-132211
+rd-132328
+rd-160052 (particles broken)

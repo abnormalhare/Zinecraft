@@ -1,0 +1,1124 @@
+diff -r src/rd-132328/character/cube.zig src/rd-160052/character/cube.zig
+21a22,24
+>     compiled: bool,
+>     list: i32,
+> 
+36a40,42
+> 
+>             .compiled = false,
+>             .list = 0,
+113a120,123
+>         if (!self.compiled) {
+>             self.compile();
+>         }
+> 
+119a130,137
+>         gl.glCallList(@intCast(self.list));
+>         gl.glPopMatrix();
+>     }
+> 
+>     pub fn compile(self: *Cube) void {
+>         self.list = @intCast(gl.glGenLists(1));
+>         gl.glNewList(@intCast(self.list), gl.GL_COMPILE);
+> 
+126c144,145
+<         gl.glPopMatrix();
+---
+>         gl.glEndList();
+>         self.compiled = true;
+diff -r src/rd-132328/character/polygon.zig src/rd-160052/character/polygon.zig
+34c34
+<             gl.glTexCoord2f(v.u / 64.0, v.v / 32.0);
+---
+>             gl.glTexCoord2f(v.u / 63.999, v.v / 31.999);
+Only in src/rd-160052/character: zombie_model.zig
+diff -r src/rd-132328/character/zombie.zig src/rd-160052/character/zombie.zig
+6a7
+> const ZombieModel = @import("zombie_model.zig").ZombieModel;
+9a11,12
+> var zombie_model = ZombieModel.new();
+> 
+13,19d15
+<     head: Cube,
+<     body: Cube,
+<     arm0: Cube,
+<     arm1: Cube,
+<     leg0: Cube,
+<     leg1: Cube,
+< 
+27,30c23
+< 
+<         entity.x = x;
+<         entity.y = y;
+<         entity.z = z;
+---
+>         entity.set_pos(x, y, z);
+36,57d28
+<         var head = Cube.new(0, 0);
+<         head.add_box(-4.0, -8.0, -4.0, 8, 8, 8);
+< 
+<         var body = Cube.new(16, 16);
+<         body.add_box(-4.0, 0.0, -2.0, 8, 12, 4);
+< 
+<         var arm0 = Cube.new(40, 16);
+<         arm0.add_box(-3.0, -2.0, -2.0, 4, 12, 4);
+<         arm0.set_pos(-5.0, 2.0, 0.0);
+< 
+<         var arm1 = Cube.new(40, 16);
+<         arm1.add_box(-1.0, -2.0, -2.0, 4, 12, 4);
+<         arm1.set_pos(5.0, 2.0, 0.0);
+< 
+<         var leg0 = Cube.new(0, 16);
+<         leg0.add_box(-2.0, 0.0, -2.0, 4, 12, 4);
+<         leg0.set_pos(-2.0, 12.0, 0.0);
+< 
+<         var leg1 = Cube.new(0, 16);
+<         leg1.add_box(-2.0, 0.0, -2.0, 4, 12, 4);
+<         leg1.set_pos(2.0, 12.0, 0.0);
+< 
+61,67d31
+<             .head = head,
+<             .body = body,
+<             .arm0 = arm0,
+<             .arm1 = arm1,
+<             .leg0 = leg0,
+<             .leg1 = leg1,
+< 
+78a43,54
+>     pub fn remove(self: *Zombie) void {
+>         self.entity.remove();
+>     }
+> 
+>     pub fn set_size(self: *Zombie, w: f32, h: f32) void {
+>         self.entity.set_size(w, h);
+>     }
+> 
+>     pub fn set_pos(self: *Zombie, x: f32, y: f32, z: f32) void {
+>         self.entity.set_pos(x, y, z);
+>     }
+> 
+89a66,69
+>         if (entity.y < -100.0) {
+>             self.remove();
+>         }
+> 
+92c72
+<         self.rot_a = @floatCast(@as(f64, self.rot_a + (rand.float(f64) - rand.float(f64)) * rand.float(f64) * rand.float(f64) * 0.01));
+---
+>         self.rot_a = @floatCast(@as(f64, self.rot_a + (rand.float(f64) - rand.float(f64)) * rand.float(f64) * rand.float(f64) * 0.08));
+97,98c77,78
+<         if (entity.on_ground and rand.float(f64) < 0.01) {
+<             entity.yd = 0.12;
+---
+>         if (entity.on_ground and rand.float(f64) < 0.08) {
+>             entity.yd = 0.5;
+101,102c81,82
+<         self.move_relative(xa, ya, if (entity.on_ground) 0.02 else 0.005);
+<         entity.yd = @floatCast(@as(f64, entity.yd) - 0.005);
+---
+>         self.move_relative(xa, ya, if (entity.on_ground) 0.1 else 0.02);
+>         entity.yd = @floatCast(@as(f64, entity.yd) - 0.08);
+109,112d88
+<         if (entity.y > 100.0) {
+<             self.reset_pos(rand);
+<         }
+< 
+114,115c90,91
+<             entity.xd *= 0.8;
+<             entity.yd *= 0.8;
+---
+>             entity.xd *= 0.7;
+>             entity.yd *= 0.7;
+126a103,106
+>     pub fn is_lit(self: *Zombie) bool {
+>         return self.entity.is_lit();
+>     }
+> 
+146d125
+< 
+149,166c128
+<         self.head.y_rot = @as(f32, @floatCast(@sin(time * 0.83)));
+<         self.head.x_rot = @as(f32, @floatCast(@sin(time))) * 0.8;
+< 
+<         self.arm0.x_rot = @as(f32, @floatCast(@sin(time * 0.6662 + std.math.pi))) * 2.0;
+<         self.arm0.z_rot = @as(f32, @floatCast(@sin(time * 0.2312) + 1.0));
+< 
+<         self.arm1.x_rot = @as(f32, @floatCast(@sin(time * 0.6662))) * 2.0;
+<         self.arm1.z_rot = @as(f32, @floatCast(@sin(time * 0.2812) - 1.0));
+< 
+<         self.leg0.x_rot = @as(f32, @floatCast(@sin(time * 0.6662))) * 1.4;
+<         self.leg1.x_rot = @as(f32, @floatCast(@sin(time * 0.6662 + std.math.pi))) * 1.4;
+< 
+<         self.head.render();
+<         self.body.render();
+<         self.arm0.render();
+<         self.arm1.render();
+<         self.leg0.render();
+<         self.leg1.render();
+---
+>         zombie_model.render(@floatCast(time));
+diff -r src/rd-132328/entity.zig src/rd-160052/entity.zig
+27a28,29
+>     removed: bool,
+> 
+28a31,32
+>     bb_width: f32,
+>     bb_height: f32,
+51a56,57
+>             .removed = false,
+> 
+52a59,60
+>             .bb_width = 0.6,
+>             .bb_height = 1.8,
+67c75,84
+<     fn set_pos(self: *Entity, x: f32, y: f32, z: f32) void {
+---
+>     pub fn remove(self: *Entity) void {
+>         self.removed = true;
+>     }
+> 
+>     pub fn set_size(self: *Entity, w: f32, h: f32) void {
+>         self.bb_width = w;
+>         self.bb_height = h;
+>     }
+> 
+>     pub fn set_pos(self: *Entity, x: f32, y: f32, z: f32) void {
+72,73c89,90
+<         const w: f32 = 0.3;
+<         const h: f32 = 0.9;
+---
+>         const w: f32 = self.bb_width / 2.0;
+>         const h: f32 = self.bb_height / 2.0;
+151a169,176
+>     }
+> 
+>     pub fn is_lit(self: *const Entity) bool {
+>         const x_tile: i32 = @intFromFloat(self.x);
+>         const y_tile: i32 = @intFromFloat(self.y);
+>         const z_tile: i32 = @intFromFloat(self.z);
+> 
+>         return self.level.is_lit(x_tile, y_tile, z_tile);
+diff -r src/rd-132328/level/chunk.zig src/rd-160052/level/chunk.zig
+5a6
+> const TesselatorFile = @import("tesselator.zig");
+8c9,10
+< const TileFile = @import("tile.zig");
+---
+> const TileFile = @import("tile/tile.zig");
+> const Player = @import("../player.zig").Player;
+10c12
+< var t: Tesselator = undefined;
+---
+> var t: *Tesselator = undefined;
+12d13
+< pub var rebuilt_this_frame: i32 = 0;
+13a15,16
+> pub var total_time: i96 = 0;
+> pub var total_updates: i32 = 0;
+15,20c18,19
+< pub fn init(alloc: std.mem.Allocator) !void {
+<     t = try Tesselator.new(alloc);
+< }
+< 
+< pub fn deinit(alloc: std.mem.Allocator) void {
+<     t.deinit(alloc);
+---
+> pub fn init() void {
+>     t = &TesselatorFile.instance;
+33a33,36
+>     x: f32,
+>     y: f32,
+>     z: f32,
+> 
+35a39
+>     dirtied_time: i64,
+45a50,54
+> 
+>             .x = @as(f32, @floatFromInt(x0 + x1)) / 2.0,
+>             .y = @as(f32, @floatFromInt(y0 + y1)) / 2.0,
+>             .z = @as(f32, @floatFromInt(z0 + z1)) / 2.0,
+> 
+56a66
+>             .dirtied_time = 0,
+60,62c70
+<     fn rebuild(self: *Chunk, layer: i32) !void {
+<         if (rebuilt_this_frame == 2) return;
+< 
+---
+>     fn rebuild_layer(self: *Chunk, io: std.Io, layer: i32) !void {
+65d72
+<         rebuilt_this_frame += 1;
+67c74
+<         const id = try Textures.load_texture("terrain.png", gl.GL_NEAREST);
+---
+>         const before: i96 = std.Io.Clock.now(.real, io).nanoseconds;
+70,71d76
+<         gl.glEnable(gl.GL_TEXTURE_2D);
+<         gl.glBindTexture(gl.GL_TEXTURE_2D, @intCast(id));
+79,87c84,87
+<                     if (!self.level.is_tile(@intCast(x), @intCast(y), @intCast(z))) continue;
+< 
+<                     tiles += 1;
+< 
+<                     const tex: bool = (y != @divTrunc(self.level.depth * 2, 3));
+<                     if (!tex) {
+<                         TileFile.rock.render(&t, self.level, layer, @intCast(x), @intCast(y), @intCast(z));
+<                     } else {
+<                         TileFile.grass.render(&t, self.level, layer, @intCast(x), @intCast(y), @intCast(z));
+---
+>                     const tile_id = self.level.get_tile(@intCast(x), @intCast(y), @intCast(z));
+>                     if (tile_id > 0) {
+>                         TileFile.tiles[@intCast(tile_id)].?.render(t, self.level, layer, @intCast(x), @intCast(y), @intCast(z));
+>                         tiles += 1;
+94,95d93
+< 
+<         gl.glDisable(gl.GL_TEXTURE_2D);
+97d94
+<     }
+99,102c96,99
+<     pub fn render(self: *Chunk, layer: i32) !void {
+<         if (self.dirty) {
+<             try self.rebuild(0);
+<             try self.rebuild(1);
+---
+>         const after: i96 = std.Io.Clock.now(.real, io).nanoseconds;
+>         if (tiles > 0) {
+>             total_time += after - before;
+>             total_updates += 1;
+103a101
+>     }
+104a103,108
+>     pub fn rebuild(self: *Chunk, io: std.Io) !void {
+>         try self.rebuild_layer(io, 0);
+>         try self.rebuild_layer(io, 1);
+>     }
+> 
+>     pub fn render(self: *Chunk, layer: i32) !void {
+108c112,116
+<     pub fn set_dirty(self: *Chunk) void {
+---
+>     pub fn set_dirty(self: *Chunk, io: std.Io) void {
+>         if (!self.dirty) {
+>             self.dirtied_time = std.Io.Clock.now(.real, io).toMilliseconds();
+>         }
+> 
+109a118,125
+>     }
+> 
+>     pub fn distance_to_sqr(self: *const Chunk, player: *Player) f32 {
+>         const xd: f32 = player.entity.x - self.x;
+>         const yd: f32 = player.entity.y - self.y;
+>         const zd: f32 = player.entity.z - self.z;
+> 
+>         return xd * xd + yd * yd + zd * zd;
+Only in src/rd-160052/level: dirty_chunk_sorter.zig
+diff -r src/rd-132328/level/frustum.zig src/rd-160052/level/frustum.zig
+159c159
+<     pub fn cube_in_frustum_aabb(self: *Frustum, aabb: AABB) bool {
+---
+>     pub fn is_visible(self: *Frustum, aabb: AABB) bool {
+diff -r src/rd-132328/level/level_renderer.zig src/rd-160052/level/level_renderer.zig
+6a7
+> const DirtyChunkSorter = @import("dirty_chunk_sorter.zig").DirtyChunkSorter;
+12a14
+> const TesselatorFile = @import("tesselator.zig");
+14c16
+< const TileFile = @import("tile.zig");
+---
+> const TileFile = @import("tile/tile.zig");
+15a18
+> const MAX_REBUILDS_PER_FRAME: usize = 8;
+18a22,23
+>     io: *const std.Io,
+> 
+28,30c33
+<     t: Tesselator,
+< 
+<     pub fn new(alloc: std.mem.Allocator, level: *Level) !*LevelRenderer {
+---
+>     pub fn new(alloc: std.mem.Allocator, io: *const std.Io, level: *Level) !*LevelRenderer {
+32a36,37
+>             .io = io,
+> 
+38,42c43,45
+<             .x_chunks = @divTrunc(level.width, 16),
+<             .y_chunks = @divTrunc(level.depth, 16),
+<             .z_chunks = @divTrunc(level.height, 16),
+< 
+<             .t = try Tesselator.new(alloc),
+---
+>             .x_chunks = @divTrunc(level.width, CHUNK_SIZE),
+>             .y_chunks = @divTrunc(level.depth, CHUNK_SIZE),
+>             .z_chunks = @divTrunc(level.height, CHUNK_SIZE),
+59,64c62,67
+<                     const x0: i32 = @as(i32, @intCast(x)) * 16;
+<                     const y0: i32 = @as(i32, @intCast(y)) * 16;
+<                     const z0: i32 = @as(i32, @intCast(z)) * 16;
+<                     var x1: i32 = @as(i32, @intCast(x + 1)) * 16;
+<                     var y1: i32 = @as(i32, @intCast(y + 1)) * 16;
+<                     var z1: i32 = @as(i32, @intCast(z + 1)) * 16;
+---
+>                     const x0: i32 = @as(i32, @intCast(x)) * CHUNK_SIZE;
+>                     const y0: i32 = @as(i32, @intCast(y)) * CHUNK_SIZE;
+>                     const z0: i32 = @as(i32, @intCast(z)) * CHUNK_SIZE;
+>                     var x1: i32 = @as(i32, @intCast(x + 1)) * CHUNK_SIZE;
+>                     var y1: i32 = @as(i32, @intCast(y + 1)) * CHUNK_SIZE;
+>                     var z1: i32 = @as(i32, @intCast(z + 1)) * CHUNK_SIZE;
+81c84,96
+<         self.t.deinit(alloc);
+---
+>     }
+> 
+>     // returns alloc'd arraylist, not contained
+>     fn get_all_dirty_chunks(self: *LevelRenderer, alloc: std.mem.Allocator) !std.ArrayList(*Chunk) {
+>         var dirty: std.ArrayList(*Chunk) = .empty;
+> 
+>         for (self.chunks) |*chunk| {
+>             if (chunk.dirty) {
+>                 try dirty.append(alloc, chunk);
+>             }
+>         }
+> 
+>         return dirty;
+85,86c100,105
+<         ChunkFile.rebuilt_this_frame = 0;
+<         const frustum: *Frustum = Frustum.get_frustum();
+---
+>         gl.glEnable(gl.GL_TEXTURE_2D);
+> 
+>         const id = try Textures.load_texture("terrain.png", gl.GL_NEAREST);
+>         gl.glBindTexture(gl.GL_TEXTURE_2D, @intCast(id));
+> 
+>         const frustum = Frustum.get_frustum();
+89c108
+<             if (frustum.cube_in_frustum_aabb(chunk.aabb)) {
+---
+>             if (frustum.is_visible(chunk.aabb)) {
+93a113,114
+>         gl.glDisable(gl.GL_TEXTURE_2D);
+> 
+96a118,133
+>     // alloc is contained
+>     pub fn update_dirty_chunks(self: *LevelRenderer, alloc: std.mem.Allocator, io: std.Io, player: *Player) !void {
+>         var dirty = try self.get_all_dirty_chunks(alloc);
+>         defer dirty.deinit(alloc);
+> 
+>         if (dirty.items.len == 0) return;
+> 
+>         std.mem.sort(*Chunk, dirty.items, DirtyChunkSorter.new(io, player, Frustum.get_frustum()), DirtyChunkSorter.compare);
+> 
+>         for (0..MAX_REBUILDS_PER_FRAME) |i| {
+>             if (i == dirty.items.len) return;
+> 
+>             try dirty.items[i].rebuild(io);
+>         }
+>     }
+> 
+97a135,136
+>         const t = &TesselatorFile.instance;
+> 
+122c161,163
+<                     if (self.level.is_solid_tile(@intCast(x), @intCast(y), @intCast(z))) {
+---
+>                     const tile = TileFile.tiles[@intCast(self.level.get_tile(x, y, z))];
+> 
+>                     if (tile != null) {
+127,129c168,170
+<                             self.t.init();
+<                             TileFile.rock.render_face(
+<                                 &self.t,
+---
+>                             t.init();
+>                             tile.?.render_face_no_texture(
+>                                 t,
+135c176
+<                             self.t.flush();
+---
+>                             t.flush();
+154a196
+>         const t = &TesselatorFile.instance;
+160,162c202,204
+<         self.t.init();
+<         TileFile.rock.render_face(&self.t, h.x, h.y, h.z, h.f);
+<         self.t.flush();
+---
+>         t.init();
+>         TileFile.rock.render_face_no_texture(t, h.x, h.y, h.z, h.f);
+>         t.flush();
+164a207,208
+> 
+>         _ = self;
+168,173c212,217
+<         const x0n: i32 = if (x0 < 0) 0 else @intCast(@divTrunc(x0, 16));
+<         const x1n: i32 = if (x1 >= self.x_chunks) @intCast(self.x_chunks - 1) else @intCast(@divTrunc(x1, 16));
+<         const y0n: i32 = if (y0 < 0) 0 else @intCast(@divTrunc(y0, 16));
+<         const y1n: i32 = if (y1 >= self.y_chunks) @intCast(self.y_chunks - 1) else @intCast(@divTrunc(y1, 16));
+<         const z0n: i32 = if (z0 < 0) 0 else @intCast(@divTrunc(z0, 16));
+<         const z1n: i32 = if (z1 >= self.z_chunks) @intCast(self.z_chunks - 1) else @intCast(@divTrunc(z1, 16));
+---
+>         const x0n: i32 = if (x0 < 0) 0 else @intCast(@divTrunc(x0, CHUNK_SIZE));
+>         const x1n: i32 = if (x1 >= self.x_chunks) @intCast(self.x_chunks - 1) else @intCast(@divTrunc(x1, CHUNK_SIZE));
+>         const y0n: i32 = if (y0 < 0) 0 else @intCast(@divTrunc(y0, CHUNK_SIZE));
+>         const y1n: i32 = if (y1 >= self.y_chunks) @intCast(self.y_chunks - 1) else @intCast(@divTrunc(y1, CHUNK_SIZE));
+>         const z0n: i32 = if (z0 < 0) 0 else @intCast(@divTrunc(z0, CHUNK_SIZE));
+>         const z1n: i32 = if (z1 >= self.z_chunks) @intCast(self.z_chunks - 1) else @intCast(@divTrunc(z1, CHUNK_SIZE));
+182c226
+<                     self.chunks[idx].set_dirty();
+---
+>                     self.chunks[idx].set_dirty(self.io.*);
+diff -r src/rd-132328/level/level.zig src/rd-160052/level/level.zig
+5a6,7
+> const PerlinNoiseFilter = @import("perlin_noise_filter.zig").PerlinNoiseFilter;
+> const TileFile = @import("tile/tile.zig");
+13d14
+<     level_listeners: std.ArrayList(LevelListener(*const anyopaque)),
+14a16,18
+>     rand: *std.Random,
+> 
+>     level_listeners: std.ArrayList(LevelListener(*const anyopaque)),
+17,19c21
+<     pub fn new(alloc: std.mem.Allocator, level_alloc: std.mem.Allocator, w: i32, h: i32, d: i32) !Level {
+<         var blocks = try alloc.alloc(u8, @intCast(w * h * d));
+<         const light_depths = try alloc.alloc(i32, @intCast(w * h));
+---
+>     unprocessed: i32,
+21,36c23,25
+<         const width: usize = @intCast(w);
+<         const height: usize = @intCast(h);
+<         const depth: usize = @intCast(d);
+< 
+<         for (0..width) |x| {
+<             for (0..depth) |y| {
+<                 for (0..height) |z| {
+<                     const i = (y * height + z) * width + x;
+<                     if (y <= (depth * 2 / 3)) {
+<                         blocks[i] = 1;
+<                     } else {
+<                         blocks[i] = 0;
+<                     }
+<                 }
+<             }
+<         }
+---
+>     pub fn new(alloc: std.mem.Allocator, rand: *std.Random, level_alloc: std.mem.Allocator, w: i32, h: i32, d: i32) !Level {
+>         const blocks = try alloc.alloc(u8, @intCast(w * h * d));
+>         const light_depths = try alloc.alloc(i32, @intCast(w * h));
+45a35,36
+>             .rand = rand,
+> 
+47a39,40
+> 
+>             .unprocessed = 0,
+49a43,47
+>         const map_loaded = try self.load();
+>         if (!map_loaded) {
+>             try self.generate_map(alloc);
+>         }
+> 
+51d48
+<         try self.load();
+63c60,115
+<     pub fn load(self: *Level) !void {
+---
+>     // alloc is contained
+>     fn generate_map(self: *Level, alloc: std.mem.Allocator) !void {
+>         const w: usize = @intCast(self.width);
+>         const h: usize = @intCast(self.height);
+>         const d: usize = @intCast(self.depth);
+> 
+>         var heightmap1filter = PerlinNoiseFilter.new(self.rand, 0);
+>         const heightmap1 = try heightmap1filter.read(alloc, @intCast(w), @intCast(h));
+>         alloc.free(heightmap1);
+> 
+>         var heightmap2filter = PerlinNoiseFilter.new(self.rand, 0);
+>         const heightmap2 = try heightmap2filter.read(alloc, @intCast(w), @intCast(h));
+>         alloc.free(heightmap2);
+> 
+>         var cf_filter = PerlinNoiseFilter.new(self.rand, 1);
+>         const cf = try cf_filter.read(alloc, @intCast(w), @intCast(h));
+>         alloc.free(cf);
+> 
+>         var rock_map_filter = PerlinNoiseFilter.new(self.rand, 1);
+>         const rock_map = try rock_map_filter.read(alloc, @intCast(w), @intCast(h));
+>         alloc.free(rock_map);
+> 
+>         for (0..w) |x| {
+>             for (0..d) |y| {
+>                 for (0..h) |z| {
+>                     const dh1 = heightmap1[z * w + x];
+>                     const cfh = cf[z * w + x];
+>                     const dh2 = if (cfh < 128) dh1 else heightmap2[z * w + x];
+> 
+>                     const dh = @divTrunc(@max(dh1, dh2), 8) + @as(i32, @intCast(@divTrunc(d, 3)));
+> 
+>                     var rh = @divTrunc(rock_map[z * w + x], 8) + @as(i32, @intCast(@divTrunc(d, 3)));
+>                     if (rh > dh - 2) {
+>                         rh = dh - 2;
+>                     }
+> 
+>                     const i = (y * h + z) * w + x;
+> 
+>                     var id: i32 = 0;
+>                     if (y == dh) {
+>                         id = TileFile.grass.get_id();
+>                     }
+>                     if (y < dh) {
+>                         id = TileFile.dirt.get_id();
+>                     }
+>                     if (y <= rh) {
+>                         id = TileFile.rock.get_id();
+>                     }
+> 
+>                     self.blocks[i] = @truncate(@as(u32, @intCast(id)));
+>                 }
+>             }
+>         }
+>     }
+> 
+>     pub fn load(self: *Level) !bool {
+67c119
+<         const file = std.Io.Dir.cwd().openFile(io, "level.dat", .{ .mode = .read_only }) catch |err| blk: {
+---
+>         const file = std.Io.Dir.cwd().openFile(io, "level.dat", .{ .mode = .read_only }) catch |err| {
+69c121,123
+<             break :blk try std.Io.Dir.cwd().createFile(io, "level.dat", .{ .read = true });
+---
+>             const file = try std.Io.Dir.cwd().createFile(io, "level.dat", .{ .read = true });
+>             file.close(io);
+>             return false;
+74c128
+<         if (stat.size == 0) return;
+---
+>         if (stat.size == 0) return false;
+94a149,150
+> 
+>         return true;
+165,177d220
+<     pub fn is_tile(self: *Level, x: i32, y: i32, z: i32) bool {
+<         if (x >= 0 and y >= 0 and z >= 0 and x < self.width and y < self.depth and z < self.height) {
+<             const index: usize = @intCast((y * self.height + z) * self.width + x);
+<             return self.blocks[index] == 1;
+<         } else {
+<             return false;
+<         }
+<     }
+< 
+<     pub fn is_solid_tile(self: *Level, x: i32, y: i32, z: i32) bool {
+<         return self.is_tile(x, y, z);
+<     }
+< 
+179c222,225
+<         return self.is_solid_tile(x, y, z);
+---
+>         const tile = TileFile.tiles[@intCast(self.get_tile(x, y, z))];
+>         if (tile == null) return false;
+> 
+>         return tile.?.blocks_light();
+244,247c290
+<     pub fn get_brightness(self: *Level, x: i32, y: i32, z: i32) f32 {
+<         const dark: f32 = 0.8;
+<         const light: f32 = 1.0;
+< 
+---
+>     pub fn set_tile(self: *Level, x: i32, y: i32, z: i32, ttype: i32) bool {
+249,251c292,294
+<             const idx: usize = @intCast(z * self.width + x);
+<             if (y < self.light_depths[idx]) {
+<                 return dark;
+---
+>             const idx: usize = @intCast((y * self.height + z) * self.width + x);
+>             if (ttype == self.blocks[idx]) {
+>                 return false;
+253,256d295
+<             return light;
+<         }
+<         return light;
+<     }
+258,260d296
+<     pub fn set_tile(self: *Level, x: i32, y: i32, z: i32, ttype: i32) void {
+<         if (x >= 0 and y >= 0 and z >= 0 and x < self.width and y < self.depth and z < self.height) {
+<             const idx: usize = @intCast((y * self.height + z) * self.width + x);
+265a302,350
+>             }
+> 
+>             return true;
+>         }
+> 
+>         return false;
+>     }
+> 
+>     pub fn is_lit(self: *Level, x: i32, y: i32, z: i32) bool {
+>         if (x >= 0 and y >= 0 and z >= 0 and x < self.width and y < self.depth and z < self.height) {
+>             const idx: usize = @intCast(z * self.width + x);
+>             return y >= self.light_depths[idx];
+>         } else {
+>             return true;
+>         }
+>     }
+> 
+>     pub fn get_tile(self: *Level, x: i32, y: i32, z: i32) i32 {
+>         if (x >= 0 and y >= 0 and z >= 0 and x < self.width and y < self.depth and z < self.height) {
+>             const block = (y * self.height + z) * self.width + x;
+>             return self.blocks[@intCast(block)];
+>         } else {
+>             return 0;
+>         }
+>     }
+> 
+>     pub fn is_solid_tile(self: *Level, x: i32, y: i32, z: i32) bool {
+>         const tile_idx = self.get_tile(x, y, z);
+>         const tile = TileFile.tiles[@intCast(tile_idx)];
+>         if (tile == null) return false;
+> 
+>         return tile.?.is_solid();
+>     }
+> 
+>     pub fn tick(self: *Level) void {
+>         self.unprocessed += self.width * self.height * self.depth;
+> 
+>         const ticks = @divTrunc(self.unprocessed, 400);
+>         self.unprocessed -= ticks * 400;
+> 
+>         for (0..@intCast(ticks)) |_| {
+>             const x = self.rand.intRangeAtMost(i32, 0, self.width - 1);
+>             const y = self.rand.intRangeAtMost(i32, 0, self.depth - 1);
+>             const z = self.rand.intRangeAtMost(i32, 0, self.height - 1);
+> 
+>             const tile_idx = self.get_tile(x, y, z);
+>             const tile = TileFile.tiles[@intCast(tile_idx)];
+>             if (tile != null) {
+>                 tile.?.tick(self, x, y, z, self.rand);
+Only in src/rd-160052/level: perlin_noise_filter.zig
+diff -r src/rd-132328/level/tesselator.zig src/rd-160052/level/tesselator.zig
+4c4,15
+< const MAX_VERTICES: i32 = 100000;
+---
+> const MAX_MEMORY_USE: i32 = 0x400000;
+> const MAX_FLOATS: i32 = 0x80000;
+> 
+> pub var instance: Tesselator = undefined;
+> 
+> pub fn init(alloc: std.mem.Allocator) !void {
+>     instance = try Tesselator.new(alloc);
+> }
+> 
+> pub fn deinit(alloc: std.mem.Allocator) void {
+>     instance.deinit(alloc);
+> }
+7,9c18
+<     vertex_buffer: []f32,
+<     tex_coord_buffer: []f32,
+<     color_buffer: []f32,
+---
+>     buffer: []f32,
+20a30,32
+>     len: i32,
+>     p: i32,
+> 
+22,27c34,41
+<         gl.glVertexPointer(3, gl.GL_FLOAT, 0, self.vertex_buffer.ptr);
+<         if (self.has_texture) {
+<             gl.glTexCoordPointer(2, gl.GL_FLOAT, 0, self.tex_coord_buffer.ptr);
+<         }
+<         if (self.has_color) {
+<             gl.glColorPointer(3, gl.GL_FLOAT, 0, self.color_buffer.ptr);
+---
+>         if (self.has_texture and self.has_color) {
+>             gl.glInterleavedArrays(gl.GL_T2F_C3F_V3F, 0, self.buffer.ptr);
+>         } else if (self.has_texture) {
+>             gl.glInterleavedArrays(gl.GL_T2F_V3F, 0, self.buffer.ptr);
+>         } else if (self.has_color) {
+>             gl.glInterleavedArrays(gl.GL_C3F_V3F, 0, self.buffer.ptr);
+>         } else {
+>             gl.glInterleavedArrays(gl.GL_V3F, 0, self.buffer.ptr);
+47a62,65
+>         self.clear();
+>     }
+> 
+>     fn clear(self: *Tesselator) void {
+48a67
+>         self.p = 0;
+52c71
+<         self.vertices = 0;
+---
+>         self.clear();
+59,61c78
+<             .vertex_buffer = try alloc.alloc(f32, MAX_VERTICES * 3),
+<             .tex_coord_buffer = try alloc.alloc(f32, MAX_VERTICES * 2),
+<             .color_buffer = try alloc.alloc(f32, MAX_VERTICES * 3),
+---
+>             .buffer = try alloc.alloc(f32, MAX_FLOATS),
+71a89,91
+> 
+>             .len = 3,
+>             .p = 0,
+76,78c96
+<         alloc.free(self.vertex_buffer);
+<         alloc.free(self.tex_coord_buffer);
+<         alloc.free(self.color_buffer);
+---
+>         alloc.free(self.buffer);
+81a100,103
+>         if (!self.has_texture) {
+>             self.len += 2;
+>         }
+> 
+87a110,113
+>         if (!self.has_color) {
+>             self.len += 3;
+>         }
+> 
+94,97c120,123
+<     pub fn vertex(self: *Tesselator, x: f32, y: f32, z: f32) void {
+<         self.vertex_buffer[@intCast(self.vertices * 3 + 0)] = x;
+<         self.vertex_buffer[@intCast(self.vertices * 3 + 1)] = y;
+<         self.vertex_buffer[@intCast(self.vertices * 3 + 2)] = z;
+---
+>     pub fn vertex_uv(self: *Tesselator, x: f32, y: f32, z: f32, u: f32, v: f32) void {
+>         self.tex(u, v);
+>         self.vertex(x, y, z);
+>     }
+98a125,131
+>     fn getp(self: *Tesselator) usize {
+>         const ret = self.p;
+>         self.p += 1;
+>         return @intCast(ret);
+>     }
+> 
+>     pub fn vertex(self: *Tesselator, x: f32, y: f32, z: f32) void {
+100,101c133,134
+<             self.tex_coord_buffer[@intCast(self.vertices * 2 + 0)] = self.u;
+<             self.tex_coord_buffer[@intCast(self.vertices * 2 + 1)] = self.v;
+---
+>             self.buffer[self.getp()] = self.u;
+>             self.buffer[self.getp()] = self.v;
+102a136
+> 
+104,106c138,140
+<             self.color_buffer[@intCast(self.vertices * 3 + 0)] = self.r;
+<             self.color_buffer[@intCast(self.vertices * 3 + 1)] = self.g;
+<             self.color_buffer[@intCast(self.vertices * 3 + 2)] = self.b;
+---
+>             self.buffer[self.getp()] = self.r;
+>             self.buffer[self.getp()] = self.g;
+>             self.buffer[self.getp()] = self.b;
+108a143,146
+>         self.buffer[self.getp()] = x;
+>         self.buffer[self.getp()] = y;
+>         self.buffer[self.getp()] = z;
+> 
+110c148
+<         if (self.vertices == MAX_VERTICES) {
+---
+>         if (self.p >= MAX_FLOATS - self.len) {
+Only in src/rd-160052/level: tile
+Only in src/rd-132328/level: tile.zig
+diff -r src/rd-132328/minecraft.zig src/rd-160052/minecraft.zig
+10a11,13
+> const Frustum = @import("level/frustum.zig").Frustum;
+> const TesselatorFile = @import("level/tesselator.zig");
+> const TileFile = @import("level/tile/tile.zig");
+13a17,18
+> const ParticleEngine = @import("particle/particle_engine.zig").ParticleEngine;
+> 
+19c24
+< const FULLSCREEN_MODE: bool = false;
+---
+> const FULLSCREEN_MODE: bool = true;
+23c28,30
+< var fog_color: [4]f32 = [_]f32{0} ** 4;
+---
+> 
+> var fog_color0: [4]f32 = [_]f32{0} ** 4;
+> var fog_color1: [4]f32 = [_]f32{0} ** 4;
+27a35,36
+> var particle_engine: ParticleEngine = undefined;
+> 
+29a39,41
+> var zombie_alloc = std.heap.page_allocator;
+> 
+> var paint_texture: i32 = 1;
+42a55,56
+> var lb: [16]f32 = [_]f32{0} ** 16;
+> 
+66c80
+<     timer = Timer.new(io, 60.0);
+---
+>     timer = Timer.new(io, 20.0);
+68c82,83
+<     const col: i32 = 0x0E0B0A;
+---
+>     const col0: i32 = 0xFEFBFA;
+>     const col1: i32 = 0x0E0B0A;
+74,77c89,99
+<     fog_color = [_]f32{
+<         @as(f32, @floatFromInt((col >> 16) & 255)) / 255.0,
+<         @as(f32, @floatFromInt((col >> 8) & 255)) / 255.0,
+<         @as(f32, @floatFromInt((col >> 0) & 255)) / 255.0,
+---
+>     fog_color0 = [_]f32{
+>         @as(f32, @floatFromInt((col0 >> 16) & 255)) / 255.0,
+>         @as(f32, @floatFromInt((col0 >> 8) & 255)) / 255.0,
+>         @as(f32, @floatFromInt((col0 >> 0) & 255)) / 255.0,
+>         1.0,
+>     };
+> 
+>     fog_color1 = [_]f32{
+>         @as(f32, @floatFromInt((col1 >> 16) & 255)) / 255.0,
+>         @as(f32, @floatFromInt((col1 >> 8) & 255)) / 255.0,
+>         @as(f32, @floatFromInt((col1 >> 0) & 255)) / 255.0,
+89c111,112
+<     try ChunkFile.init(alloc);
+---
+>     try TesselatorFile.init(alloc);
+>     ChunkFile.init();
+101,102c124,125
+<     level = try .new(alloc, std.heap.page_allocator, 256, 256, 64);
+<     level_renderer = try LevelRenderer.new(alloc, &level);
+---
+>     level = try .new(alloc, &rand, std.heap.page_allocator, 256, 256, 64);
+>     level_renderer = try LevelRenderer.new(alloc, &io, &level);
+103a127
+>     particle_engine = .new(alloc, &level);
+109c133,135
+<         try zombies.append(alloc, Zombie.new(&level, &rand, 128.0, 0.0, 128.0));
+---
+>         var zombie = Zombie.new(&level, &rand, 128.0, 0.0, 128.0);
+>         zombie.reset_pos(&rand);
+>         try zombies.append(zombie_alloc, zombie);
+118c144
+<     zombies.deinit(alloc);
+---
+>     zombies.deinit(zombie_alloc);
+125c151
+<     ChunkFile.deinit(alloc);
+---
+>     TesselatorFile.deinit(alloc);
+139a166,167
+>     const contained_alloc = std.heap.page_allocator;
+> 
+150c178
+<         try render(io, timer.a);
+---
+>         try render(contained_alloc, io, timer.a);
+161a190
+> // read entity.move, alloc is contained
+164a194,196
+>     level.tick();
+>     try particle_engine.tick(&rand);
+> 
+197a230,239
+> fn setup_ortho_camera() void {
+>     gl.glMatrixMode(gl.GL_PROJECTION);
+>     gl.glLoadIdentity();
+>     gl.glOrtho(0.0, @floatFromInt(width), @floatFromInt(height), 0.0, 100.0, 300.0);
+> 
+>     gl.glMatrixMode(gl.GL_MODELVIEW);
+>     gl.glLoadIdentity();
+>     gl.glTranslatef(0.0, 0.0, -200.0);
+> }
+> 
+227,228d268
+<     // std.debug.print("hits: {}\n", .{hits});
+< 
+262c302,309
+<         level.set_tile(hit_result.?.x, hit_result.?.y, hit_result.?.z, 0);
+---
+>         const tile_id = level.get_tile(hit_result.?.x, hit_result.?.y, hit_result.?.z);
+>         const tile = TileFile.tiles[@intCast(tile_id)];
+>         const block_broke = level.set_tile(hit_result.?.x, hit_result.?.y, hit_result.?.z, 0);
+>         if (tile != null and block_broke) {
+>             tile.?.destroy(&level, &rand, hit_result.?.x, hit_result.?.y, hit_result.?.z, &particle_engine) catch |err| {
+>                 std.debug.print("ERROR: tile failed to be destroyed: {any}", .{err});
+>             };
+>         }
+280c327
+<         level.set_tile(x, y, z, 1);
+---
+>         _ = level.set_tile(x, y, z, paint_texture);
+287,290c334,359
+<     if (key == .enter and action == .press) {
+<         level.save() catch {
+<             std.debug.print("OH NO! Could not save level!\n", .{});
+<         };
+---
+>     if (action != .press) return;
+> 
+>     switch (key) {
+>         .enter => {
+>             level.save() catch {
+>                 std.debug.print("OH NO! Could not save level!\n", .{});
+>             };
+>         },
+>         .one => {
+>             paint_texture = 1;
+>         },
+>         .two => {
+>             paint_texture = 3;
+>         },
+>         .three => {
+>             paint_texture = 4;
+>         },
+>         .four => {
+>             paint_texture = 5;
+>         },
+>         .g => {
+>             zombies.append(zombie_alloc, Zombie.new(&level, &rand, player.entity.x, player.entity.y, player.entity.z)) catch |err| {
+>                 std.debug.print("ERROR: Failed to append zombie: {any}", .{err});
+>             };
+>         },
+>         else => {},
+301c370
+< pub fn render(io: std.Io, a: f32) !void {
+---
+> pub fn render(alloc: std.mem.Allocator, io: std.Io, a: f32) !void {
+323,327c392,393
+<     gl.glEnable(gl.GL_FOG);
+<     gl.glFogi(gl.GL_FOG_MODE, gl.GL_EXP);
+<     gl.glFogf(gl.GL_FOG_DENSITY, 0.2);
+<     gl.glFogfv(gl.GL_FOG_COLOR, &fog_color);
+<     gl.glDisable(gl.GL_FOG);
+---
+>     const frustum = Frustum.get_frustum();
+>     try level_renderer.update_dirty_chunks(alloc, io, &player);
+328a395,397
+>     setup_fog(0);
+> 
+>     gl.glEnable(gl.GL_FOG);
+332c401,403
+<         try zombie.render(io, a);
+---
+>         if (zombie.is_lit() and frustum.is_visible(zombie.entity.bb)) {
+>             try zombie.render(io, a);
+>         }
+335c406,408
+<     gl.glEnable(gl.GL_FOG);
+---
+>     try particle_engine.render(&player, a, 0);
+> 
+>     setup_fog(1);
+337a411,419
+>     for (zombies.items) |*zombie| {
+>         if (!zombie.is_lit() and frustum.is_visible(zombie.entity.bb)) {
+>             try zombie.render(io, a);
+>         }
+>     }
+> 
+>     try particle_engine.render(&player, a, 1);
+> 
+>     gl.glDisable(gl.GL_LIGHTING);
+338a421,422
+>     gl.glDisable(gl.GL_FOG);
+> 
+343c427
+<     _ = Cube.new(0, 0);
+---
+>     try draw_gui(a);
+345d428
+<     gl.glDisable(gl.GL_FOG);
+347a431,504
+> }
+> 
+> fn draw_gui(a: f32) !void {
+>     gl.glClear(gl.GL_DEPTH_BUFFER_BIT);
+> 
+>     setup_ortho_camera();
+>     gl.glPushMatrix();
+>     gl.glTranslatef(@floatFromInt(width - 48), 48.0, 0.0);
+> 
+>     var t = TesselatorFile.instance;
+> 
+>     gl.glScalef(48.0, 48.0, 48.0);
+>     gl.glRotatef(30.0, 1.0, 0.0, 0.0);
+>     gl.glRotatef(45.0, 0.0, 1.0, 0.0);
+>     gl.glTranslatef(1.5, -0.5, -0.5);
+> 
+>     const id = try Textures.load_texture("terrain.png", gl.GL_NEAREST);
+>     gl.glBindTexture(gl.GL_TEXTURE_2D, @intCast(id));
+>     gl.glEnable(gl.GL_TEXTURE_2D);
+> 
+>     t.init();
+>     TileFile.tiles[@intCast(paint_texture)].?.render(&t, &level, 0, -2, 0, 0);
+>     t.flush();
+> 
+>     gl.glDisable(gl.GL_TEXTURE_2D);
+>     gl.glPopMatrix();
+> 
+>     const wc = @divTrunc(width, 2);
+>     const hc = @divTrunc(height, 2);
+> 
+>     gl.glColor4f(1.0, 1.0, 1.0, 1.0);
+> 
+>     t.init();
+>     t.vertex(@floatFromInt(wc + 1), @floatFromInt(hc - 8), 0.0);
+>     t.vertex(@floatFromInt(wc - 0), @floatFromInt(hc - 8), 0.0);
+>     t.vertex(@floatFromInt(wc - 0), @floatFromInt(hc + 9), 0.0);
+>     t.vertex(@floatFromInt(wc + 1), @floatFromInt(hc + 9), 0.0);
+>     t.vertex(@floatFromInt(wc + 9), @floatFromInt(hc - 0), 0.0);
+>     t.vertex(@floatFromInt(wc - 8), @floatFromInt(hc - 0), 0.0);
+>     t.vertex(@floatFromInt(wc - 8), @floatFromInt(hc + 1), 0.0);
+>     t.vertex(@floatFromInt(wc + 9), @floatFromInt(hc + 1), 0.0);
+>     t.flush();
+> 
+>     _ = a;
+> }
+> 
+> fn setup_fog(i: i32) void {
+>     switch (i) {
+>         0 => {
+>             gl.glFogi(gl.GL_FOG_MODE, gl.GL_EXP);
+>             gl.glFogf(gl.GL_FOG_DENSITY, 0.001);
+>             gl.glFogfv(gl.GL_FOG_COLOR, &fog_color0);
+>             gl.glDisable(gl.GL_LIGHTING);
+>         },
+>         1 => {
+>             gl.glFogi(gl.GL_FOG_MODE, gl.GL_EXP);
+>             gl.glFogf(gl.GL_FOG_DENSITY, 0.06);
+>             gl.glFogfv(gl.GL_FOG_COLOR, &fog_color1);
+>             gl.glEnable(gl.GL_LIGHTING);
+>             gl.glEnable(gl.GL_COLOR_MATERIAL);
+> 
+>             const br: f32 = 0.6;
+>             gl.glLightModelfv(gl.GL_LIGHT_MODEL_AMBIENT, get_buffer(br, br, br, 1.0));
+>         },
+>         else => {},
+>     }
+> }
+> 
+> fn get_buffer(a: f32, b: f32, c: f32, d: f32) [*c]const f32 {
+>     lb[0] = a;
+>     lb[1] = b;
+>     lb[2] = c;
+>     lb[3] = d;
+>     return &lb;
+Only in src/rd-160052/: particle
+diff -r src/rd-132328/player.zig src/rd-160052/player.zig
+58c58
+<             entity.yd = 0.12;
+---
+>             entity.yd = 0.5;
+61,62c61,62
+<         entity.move_relative(xa, ya, if (entity.on_ground) 0.02 else 0.005);
+<         entity.yd = @as(f32, @floatCast(@as(f64, entity.yd) - 0.005));
+---
+>         entity.move_relative(xa, ya, if (entity.on_ground) 0.1 else 0.02);
+>         entity.yd = @as(f32, @floatCast(@as(f64, entity.yd) - 0.08));
+70,71c70,71
+<             entity.xd *= 0.8;
+<             entity.zd *= 0.8;
+---
+>             entity.xd *= 0.7;
+>             entity.zd *= 0.7;
+diff -r src/rd-132328/timer.zig src/rd-160052/timer.zig
+3c3
+< const NS_PER_SECOND: f32 = @floatFromInt(std.time.ns_per_s);
+---
+> const NS_PER_SECOND = std.time.ns_per_s;
+45,48c45,46
+<         const passed_ns_f: f32 = @floatFromInt(passed_ns);
+< 
+<         self.fps = NS_PER_SECOND / passed_ns_f;
+<         self.passed_time += passed_ns_f * self.time_scale * self.ticks_per_second / NS_PER_SECOND;
+---
+>         self.fps = @floatFromInt(@divTrunc(NS_PER_SECOND, passed_ns));
+>         self.passed_time += @as(f32, @floatFromInt(passed_ns)) * self.time_scale * self.ticks_per_second / @as(f32, @floatFromInt(NS_PER_SECOND));

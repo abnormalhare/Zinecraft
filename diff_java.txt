@@ -1,0 +1,1308 @@
+diff -r rd-132328/src/com/mojang/rubydung/character/Cube.java rd-160052/src/com/mojang/rubydung/character/Cube.java
+15a16,17
+> 	private boolean compiled = false;
+> 	private int list = 0;
+63a66,69
+> 		if(!this.compiled) {
+> 			this.compile();
+> 		}
+> 
+69a76,82
+> 		GL11.glCallList(this.list);
+> 		GL11.glPopMatrix();
+> 	}
+> 
+> 	private void compile() {
+> 		this.list = GL11.glGenLists(1);
+> 		GL11.glNewList(this.list, GL11.GL_COMPILE);
+77c90,91
+< 		GL11.glPopMatrix();
+---
+> 		GL11.glEndList();
+> 		this.compiled = true;
+diff -r rd-132328/src/com/mojang/rubydung/character/Polygon.java rd-160052/src/com/mojang/rubydung/character/Polygon.java
+28c28
+< 			GL11.glTexCoord2f(v.u / 64.0F, v.v / 32.0F);
+---
+> 			GL11.glTexCoord2f(v.u / 63.999F, v.v / 31.999F);
+diff -r rd-132328/src/com/mojang/rubydung/character/Zombie.java rd-160052/src/com/mojang/rubydung/character/Zombie.java
+9,14d8
+< 	public Cube head;
+< 	public Cube body;
+< 	public Cube arm0;
+< 	public Cube arm1;
+< 	public Cube leg0;
+< 	public Cube leg1;
+18a13
+> 	private static ZombieModel zombieModel = new ZombieModel();
+22,24c17
+< 		this.x = x;
+< 		this.y = y;
+< 		this.z = z;
+---
+> 		this.setPos(x, y, z);
+28,43d20
+< 		this.head = new Cube(0, 0);
+< 		this.head.addBox(-4.0F, -8.0F, -4.0F, 8, 8, 8);
+< 		this.body = new Cube(16, 16);
+< 		this.body.addBox(-4.0F, 0.0F, -2.0F, 8, 12, 4);
+< 		this.arm0 = new Cube(40, 16);
+< 		this.arm0.addBox(-3.0F, -2.0F, -2.0F, 4, 12, 4);
+< 		this.arm0.setPos(-5.0F, 2.0F, 0.0F);
+< 		this.arm1 = new Cube(40, 16);
+< 		this.arm1.addBox(-1.0F, -2.0F, -2.0F, 4, 12, 4);
+< 		this.arm1.setPos(5.0F, 2.0F, 0.0F);
+< 		this.leg0 = new Cube(0, 16);
+< 		this.leg0.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4);
+< 		this.leg0.setPos(-2.0F, 12.0F, 0.0F);
+< 		this.leg1 = new Cube(0, 16);
+< 		this.leg1.addBox(-2.0F, 0.0F, -2.0F, 4, 12, 4);
+< 		this.leg1.setPos(2.0F, 12.0F, 0.0F);
+51a29,32
+> 		if(this.y < -100.0F) {
+> 			this.remove();
+> 		}
+> 
+54c35
+< 		this.rotA = (float)((double)this.rotA + (Math.random() - Math.random()) * Math.random() * Math.random() * (double)0.01F);
+---
+> 		this.rotA = (float)((double)this.rotA + (Math.random() - Math.random()) * Math.random() * Math.random() * (double)0.08F);
+57,58c38,39
+< 		if(this.onGround && Math.random() < 0.01D) {
+< 			this.yd = 0.12F;
+---
+> 		if(this.onGround && Math.random() < 0.08D) {
+> 			this.yd = 0.5F;
+61,62c42,43
+< 		this.moveRelative(xa, ya, this.onGround ? 0.02F : 0.005F);
+< 		this.yd = (float)((double)this.yd - 0.005D);
+---
+> 		this.moveRelative(xa, ya, this.onGround ? 0.1F : 0.02F);
+> 		this.yd = (float)((double)this.yd - 0.08D);
+67,70d47
+< 		if(this.y > 100.0F) {
+< 			this.resetPos();
+< 		}
+< 
+72,73c49,50
+< 			this.xd *= 0.8F;
+< 			this.zd *= 0.8F;
+---
+> 			this.xd *= 0.7F;
+> 			this.zd *= 0.7F;
+91,104c68
+< 		this.head.yRot = (float)Math.sin(time * 0.83D) * 1.0F;
+< 		this.head.xRot = (float)Math.sin(time) * 0.8F;
+< 		this.arm0.xRot = (float)Math.sin(time * 0.6662D + Math.PI) * 2.0F;
+< 		this.arm0.zRot = (float)(Math.sin(time * 0.2312D) + 1.0D) * 1.0F;
+< 		this.arm1.xRot = (float)Math.sin(time * 0.6662D) * 2.0F;
+< 		this.arm1.zRot = (float)(Math.sin(time * 0.2812D) - 1.0D) * 1.0F;
+< 		this.leg0.xRot = (float)Math.sin(time * 0.6662D) * 1.4F;
+< 		this.leg1.xRot = (float)Math.sin(time * 0.6662D + Math.PI) * 1.4F;
+< 		this.head.render();
+< 		this.body.render();
+< 		this.arm0.render();
+< 		this.arm1.render();
+< 		this.leg0.render();
+< 		this.leg1.render();
+---
+> 		zombieModel.render((float)time);
+Only in rd-160052/src/com/mojang/rubydung/character: ZombieModel.java
+diff -r rd-132328/src/com/mojang/rubydung/Entity.java rd-160052/src/com/mojang/rubydung/Entity.java
+8c8
+< 	private Level level;
+---
+> 	protected Level level;
+21a22
+> 	public boolean removed = false;
+22a24,25
+> 	protected float bbWidth = 0.6F;
+> 	protected float bbHeight = 1.8F;
+36c39,48
+< 	private void setPos(float x, float y, float z) {
+---
+> 	public void remove() {
+> 		this.removed = true;
+> 	}
+> 
+> 	protected void setSize(float w, float h) {
+> 		this.bbWidth = w;
+> 		this.bbHeight = h;
+> 	}
+> 
+> 	protected void setPos(float x, float y, float z) {
+40,41c52,53
+< 		float w = 0.3F;
+< 		float h = 0.9F;
+---
+> 		float w = this.bbWidth / 2.0F;
+> 		float h = this.bbHeight / 2.0F;
+116a129,135
+> 	}
+> 
+> 	public boolean isLit() {
+> 		int xTile = (int)this.x;
+> 		int yTile = (int)this.y;
+> 		int zTile = (int)this.z;
+> 		return this.level.isLit(xTile, yTile, zTile);
+diff -r rd-132328/src/com/mojang/rubydung/level/Chunk.java rd-160052/src/com/mojang/rubydung/level/Chunk.java
+3c3,4
+< import com.mojang.rubydung.Textures;
+---
+> import com.mojang.rubydung.Player;
+> import com.mojang.rubydung.level.tile.Tile;
+15a17,19
+> 	public final float x;
+> 	public final float y;
+> 	public final float z;
+18,19c22,23
+< 	private static Tesselator t = new Tesselator();
+< 	public static int rebuiltThisFrame = 0;
+---
+> 	public long dirtiedTime = 0L;
+> 	private static Tesselator t = Tesselator.instance;
+20a25,26
+> 	private static long totalTime = 0L;
+> 	private static int totalUpdates = 0;
+29a36,38
+> 		this.x = (float)(x0 + x1) / 2.0F;
+> 		this.y = (float)(y0 + y1) / 2.0F;
+> 		this.z = (float)(z0 + z1) / 2.0F;
+35,57c44,57
+< 		if(rebuiltThisFrame != 2) {
+< 			this.dirty = false;
+< 			++updates;
+< 			++rebuiltThisFrame;
+< 			int id = Textures.loadTexture("/terrain.png", 9728);
+< 			GL11.glNewList(this.lists + layer, GL11.GL_COMPILE);
+< 			GL11.glEnable(GL11.GL_TEXTURE_2D);
+< 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, id);
+< 			t.init();
+< 			int tiles = 0;
+< 
+< 			for(int x = this.x0; x < this.x1; ++x) {
+< 				for(int y = this.y0; y < this.y1; ++y) {
+< 					for(int z = this.z0; z < this.z1; ++z) {
+< 						if(this.level.isTile(x, y, z)) {
+< 							boolean tex = y != this.level.depth * 2 / 3;
+< 							++tiles;
+< 							if(!tex) {
+< 								Tile.rock.render(t, this.level, layer, x, y, z);
+< 							} else {
+< 								Tile.grass.render(t, this.level, layer, x, y, z);
+< 							}
+< 						}
+---
+> 		this.dirty = false;
+> 		++updates;
+> 		long before = System.nanoTime();
+> 		GL11.glNewList(this.lists + layer, GL11.GL_COMPILE);
+> 		t.init();
+> 		int tiles = 0;
+> 
+> 		for(int after = this.x0; after < this.x1; ++after) {
+> 			for(int y = this.y0; y < this.y1; ++y) {
+> 				for(int z = this.z0; z < this.z1; ++z) {
+> 					int tileId = this.level.getTile(after, y, z);
+> 					if(tileId > 0) {
+> 						Tile.tiles[tileId].render(t, this.level, layer, after, y, z);
+> 						++tiles;
+60a61
+> 		}
+62,64c63,68
+< 			t.flush();
+< 			GL11.glDisable(GL11.GL_TEXTURE_2D);
+< 			GL11.glEndList();
+---
+> 		t.flush();
+> 		GL11.glEndList();
+> 		long var9 = System.nanoTime();
+> 		if(tiles > 0) {
+> 			totalTime += var9 - before;
+> 			++totalUpdates;
+65a70
+> 
+68,72c73,76
+< 	public void render(int layer) {
+< 		if(this.dirty) {
+< 			this.rebuild(0);
+< 			this.rebuild(1);
+< 		}
+---
+> 	public void rebuild() {
+> 		this.rebuild(0);
+> 		this.rebuild(1);
+> 	}
+73a78
+> 	public void render(int layer) {
+77a83,86
+> 		if(!this.dirty) {
+> 			this.dirtiedTime = System.currentTimeMillis();
+> 		}
+> 
+78a88,98
+> 	}
+> 
+> 	public boolean isDirty() {
+> 		return this.dirty;
+> 	}
+> 
+> 	public float distanceToSqr(Player player) {
+> 		float xd = player.x - this.x;
+> 		float yd = player.y - this.y;
+> 		float zd = player.z - this.z;
+> 		return xd * xd + yd * yd + zd * zd;
+Only in rd-160052/src/com/mojang/rubydung/level: DirtyChunkSorter.java
+diff -r rd-132328/src/com/mojang/rubydung/level/Frustum.java rd-160052/src/com/mojang/rubydung/level/Frustum.java
+167c167
+< 	public boolean cubeInFrustum(AABB aabb) {
+---
+> 	public boolean isVisible(AABB aabb) {
+diff -r rd-132328/src/com/mojang/rubydung/level/Level.java rd-160052/src/com/mojang/rubydung/level/Level.java
+2a3
+> import com.mojang.rubydung.level.tile.Tile;
+9a11
+> import java.util.Random;
+13a16
+> 	private static final int TILE_UPDATE_INTERVAL = 400;
+19a23,24
+> 	private Random random = new Random();
+> 	int unprocessed = 0;
+26a32,47
+> 		boolean mapLoaded = this.load();
+> 		if(!mapLoaded) {
+> 			this.generateMap();
+> 		}
+> 
+> 		this.calcLightDepths(0, 0, w, h);
+> 	}
+> 
+> 	private void generateMap() {
+> 		int w = this.width;
+> 		int h = this.height;
+> 		int d = this.depth;
+> 		int[] heightmap1 = (new PerlinNoiseFilter(0)).read(w, h);
+> 		int[] heightmap2 = (new PerlinNoiseFilter(0)).read(w, h);
+> 		int[] cf = (new PerlinNoiseFilter(1)).read(w, h);
+> 		int[] rockMap = (new PerlinNoiseFilter(1)).read(w, h);
+30a52,69
+> 					int dh1 = heightmap1[x + z * this.width];
+> 					int dh2 = heightmap2[x + z * this.width];
+> 					int cfh = cf[x + z * this.width];
+> 					if(cfh < 128) {
+> 						dh2 = dh1;
+> 					}
+> 
+> 					int dh = dh1;
+> 					if(dh2 > dh1) {
+> 						dh = dh2;
+> 					}
+> 
+> 					dh = dh / 8 + d / 3;
+> 					int rh = rockMap[x + z * this.width] / 8 + d / 3;
+> 					if(rh > dh - 2) {
+> 						rh = dh - 2;
+> 					}
+> 
+32c71,84
+< 					this.blocks[i] = (byte)(y <= d * 2 / 3 ? 1 : 0);
+---
+> 					int id = 0;
+> 					if(y == dh) {
+> 						id = Tile.grass.id;
+> 					}
+> 
+> 					if(y < dh) {
+> 						id = Tile.dirt.id;
+> 					}
+> 
+> 					if(y <= rh) {
+> 						id = Tile.rock.id;
+> 					}
+> 
+> 					this.blocks[i] = (byte)id;
+37,38d88
+< 		this.calcLightDepths(0, 0, w, h);
+< 		this.load();
+41c91
+< 	public void load() {
+---
+> 	public boolean load() {
+51a102
+> 			return true;
+53a105
+> 			return false;
+55d106
+< 
+100,107d150
+< 	public boolean isTile(int x, int y, int z) {
+< 		return x >= 0 && y >= 0 && z >= 0 && x < this.width && y < this.depth && z < this.height ? this.blocks[(y * this.height + z) * this.width + x] == 1 : false;
+< 	}
+< 
+< 	public boolean isSolidTile(int x, int y, int z) {
+< 		return this.isTile(x, y, z);
+< 	}
+< 
+109c152,153
+< 		return this.isSolidTile(x, y, z);
+---
+> 		Tile tile = Tile.tiles[this.getTile(x, y, z)];
+> 		return tile == null ? false : tile.blocksLight();
+147,148c191,193
+< 					if(this.isSolidTile(x, y, z)) {
+< 						aABBs.add(new AABB((float)x, (float)y, (float)z, (float)(x + 1), (float)(y + 1), (float)(z + 1)));
+---
+> 					Tile tile = Tile.tiles[this.getTile(x, y, z)];
+> 					if(tile != null) {
+> 						aABBs.add(tile.getAABB(x, y, z));
+157,163c202
+< 	public float getBrightness(int x, int y, int z) {
+< 		float dark = 0.8F;
+< 		float light = 1.0F;
+< 		return x >= 0 && y >= 0 && z >= 0 && x < this.width && y < this.depth && z < this.height ? (y < this.lightDepths[x + z * this.width] ? dark : light) : light;
+< 	}
+< 
+< 	public void setTile(int x, int y, int z, int type) {
+---
+> 	public boolean setTile(int x, int y, int z, int type) {
+165,166c204,208
+< 			this.blocks[(y * this.height + z) * this.width + x] = (byte)type;
+< 			this.calcLightDepths(x, z, 1, 1);
+---
+> 			if(type == this.blocks[(y * this.height + z) * this.width + x]) {
+> 				return false;
+> 			} else {
+> 				this.blocks[(y * this.height + z) * this.width + x] = (byte)type;
+> 				this.calcLightDepths(x, z, 1, 1);
+168,169c210,214
+< 			for(int i = 0; i < this.levelListeners.size(); ++i) {
+< 				((LevelListener)this.levelListeners.get(i)).tileChanged(x, y, z);
+---
+> 				for(int i = 0; i < this.levelListeners.size(); ++i) {
+> 					((LevelListener)this.levelListeners.get(i)).tileChanged(x, y, z);
+> 				}
+> 
+> 				return true;
+170a216,227
+> 		} else {
+> 			return false;
+> 		}
+> 	}
+> 
+> 	public boolean isLit(int x, int y, int z) {
+> 		return x >= 0 && y >= 0 && z >= 0 && x < this.width && y < this.depth && z < this.height ? y >= this.lightDepths[x + z * this.width] : true;
+> 	}
+> 
+> 	public int getTile(int x, int y, int z) {
+> 		return x >= 0 && y >= 0 && z >= 0 && x < this.width && y < this.depth && z < this.height ? this.blocks[(y * this.height + z) * this.width + x] : 0;
+> 	}
+171a229,246
+> 	public boolean isSolidTile(int x, int y, int z) {
+> 		Tile tile = Tile.tiles[this.getTile(x, y, z)];
+> 		return tile == null ? false : tile.isSolid();
+> 	}
+> 
+> 	public void tick() {
+> 		this.unprocessed += this.width * this.height * this.depth;
+> 		int ticks = this.unprocessed / 400;
+> 		this.unprocessed -= ticks * 400;
+> 
+> 		for(int i = 0; i < ticks; ++i) {
+> 			int x = this.random.nextInt(this.width);
+> 			int y = this.random.nextInt(this.depth);
+> 			int z = this.random.nextInt(this.height);
+> 			Tile tile = Tile.tiles[this.getTile(x, y, z)];
+> 			if(tile != null) {
+> 				tile.tick(this, x, y, z, this.random);
+> 			}
+172a248
+> 
+diff -r rd-132328/src/com/mojang/rubydung/level/LevelRenderer.java rd-160052/src/com/mojang/rubydung/level/LevelRenderer.java
+4a5,6
+> import com.mojang.rubydung.Textures;
+> import com.mojang.rubydung.level.tile.Tile;
+5a8,10
+> import java.util.ArrayList;
+> import java.util.Collections;
+> import java.util.List;
+9c14,15
+< 	private static final int CHUNK_SIZE = 16;
+---
+> 	public static final int MAX_REBUILDS_PER_FRAME = 8;
+> 	public static final int CHUNK_SIZE = 16;
+15d20
+< 	Tesselator t = new Tesselator();
+52a58,74
+> 	public List<Chunk> getAllDirtyChunks() {
+> 		ArrayList dirty = null;
+> 
+> 		for(int i = 0; i < this.chunks.length; ++i) {
+> 			Chunk chunk = this.chunks[i];
+> 			if(chunk.isDirty()) {
+> 				if(dirty == null) {
+> 					dirty = new ArrayList();
+> 				}
+> 
+> 				dirty.add(chunk);
+> 			}
+> 		}
+> 
+> 		return dirty;
+> 	}
+> 
+54c76,78
+< 		Chunk.rebuiltThisFrame = 0;
+---
+> 		GL11.glEnable(GL11.GL_TEXTURE_2D);
+> 		int id = Textures.loadTexture("/terrain.png", 9728);
+> 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, id);
+58c82
+< 			if(frustum.cubeInFrustum(this.chunks[i].aabb)) {
+---
+> 			if(frustum.isVisible(this.chunks[i].aabb)) {
+62a87,99
+> 		GL11.glDisable(GL11.GL_TEXTURE_2D);
+> 	}
+> 
+> 	public void updateDirtyChunks(Player player) {
+> 		List dirty = this.getAllDirtyChunks();
+> 		if(dirty != null) {
+> 			Collections.sort(dirty, new DirtyChunkSorter(player, Frustum.getFrustum()));
+> 
+> 			for(int i = 0; i < 8 && i < dirty.size(); ++i) {
+> 				((Chunk)dirty.get(i)).rebuild();
+> 			}
+> 
+> 		}
+65a103
+> 		Tesselator t = Tesselator.instance;
+84c122,123
+< 					if(this.level.isSolidTile(x, y, z)) {
+---
+> 					Tile tile = Tile.tiles[this.level.getTile(x, y, z)];
+> 					if(tile != null) {
+89,91c128,130
+< 							this.t.init();
+< 							Tile.rock.renderFace(this.t, x, y, z, i);
+< 							this.t.flush();
+---
+> 							t.init();
+> 							tile.renderFaceNoTexture(t, x, y, z, i);
+> 							t.flush();
+109a149
+> 		Tesselator t = Tesselator.instance;
+112,115c152,155
+< 		GL11.glColor4f(1.0F, 1.0F, 1.0F, (float)Math.sin((double)System.currentTimeMillis() / 100.0D) * 0.2F + 0.4F);
+< 		this.t.init();
+< 		Tile.rock.renderFace(this.t, h.x, h.y, h.z, h.f);
+< 		this.t.flush();
+---
+> 		GL11.glColor4f(1.0F, 1.0F, 1.0F, ((float)Math.sin((double)System.currentTimeMillis() / 100.0D) * 0.2F + 0.4F) * 0.5F);
+> 		t.init();
+> 		Tile.rock.renderFaceNoTexture(t, h.x, h.y, h.z, h.f);
+> 		t.flush();
+Only in rd-160052/src/com/mojang/rubydung/level: PerlinNoiseFilter.java
+diff -r rd-132328/src/com/mojang/rubydung/level/Tesselator.java rd-160052/src/com/mojang/rubydung/level/Tesselator.java
+8,11c8,11
+< 	private static final int MAX_VERTICES = 100000;
+< 	private FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(300000);
+< 	private FloatBuffer texCoordBuffer = BufferUtils.createFloatBuffer(200000);
+< 	private FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(300000);
+---
+> 	private static final int MAX_MEMORY_USE = 4194304;
+> 	private static final int MAX_FLOATS = 524288;
+> 	private FloatBuffer buffer = BufferUtils.createFloatBuffer(524288);
+> 	private float[] array = new float[524288];
+19a20,22
+> 	private int len = 3;
+> 	private int p = 0;
+> 	public static Tesselator instance = new Tesselator();
+22,31c25,35
+< 		this.vertexBuffer.flip();
+< 		this.texCoordBuffer.flip();
+< 		this.colorBuffer.flip();
+< 		GL11.glVertexPointer(3, 0, (FloatBuffer)this.vertexBuffer);
+< 		if(this.hasTexture) {
+< 			GL11.glTexCoordPointer(2, 0, (FloatBuffer)this.texCoordBuffer);
+< 		}
+< 
+< 		if(this.hasColor) {
+< 			GL11.glColorPointer(3, 0, (FloatBuffer)this.colorBuffer);
+---
+> 		this.buffer.clear();
+> 		this.buffer.put(this.array, 0, this.p);
+> 		this.buffer.flip();
+> 		if(this.hasTexture && this.hasColor) {
+> 			GL11.glInterleavedArrays(GL11.GL_T2F_C3F_V3F, 0, (FloatBuffer)this.buffer);
+> 		} else if(this.hasTexture) {
+> 			GL11.glInterleavedArrays(GL11.GL_T2F_V3F, 0, (FloatBuffer)this.buffer);
+> 		} else if(this.hasColor) {
+> 			GL11.glInterleavedArrays(GL11.GL_C3F_V3F, 0, (FloatBuffer)this.buffer);
+> 		} else {
+> 			GL11.glInterleavedArrays(GL11.GL_V3F, 0, (FloatBuffer)this.buffer);
+58,60c62,63
+< 		this.vertexBuffer.clear();
+< 		this.texCoordBuffer.clear();
+< 		this.colorBuffer.clear();
+---
+> 		this.buffer.clear();
+> 		this.p = 0;
+69a73,76
+> 		if(!this.hasTexture) {
+> 			this.len += 2;
+> 		}
+> 
+75a83,86
+> 		if(!this.hasColor) {
+> 			this.len += 3;
+> 		}
+> 
+81a93,97
+> 	public void vertexUV(float x, float y, float z, float u, float v) {
+> 		this.tex(u, v);
+> 		this.vertex(x, y, z);
+> 	}
+> 
+83d98
+< 		this.vertexBuffer.put(this.vertices * 3 + 0, x).put(this.vertices * 3 + 1, y).put(this.vertices * 3 + 2, z);
+85c100,101
+< 			this.texCoordBuffer.put(this.vertices * 2 + 0, this.u).put(this.vertices * 2 + 1, this.v);
+---
+> 			this.array[this.p++] = this.u;
+> 			this.array[this.p++] = this.v;
+89c105,107
+< 			this.colorBuffer.put(this.vertices * 3 + 0, this.r).put(this.vertices * 3 + 1, this.g).put(this.vertices * 3 + 2, this.b);
+---
+> 			this.array[this.p++] = this.r;
+> 			this.array[this.p++] = this.g;
+> 			this.array[this.p++] = this.b;
+91a110,112
+> 		this.array[this.p++] = x;
+> 		this.array[this.p++] = y;
+> 		this.array[this.p++] = z;
+93c114
+< 		if(this.vertices == 100000) {
+---
+> 		if(this.p >= 524288 - this.len) {
+Only in rd-160052/src/com/mojang/rubydung/level: tile
+Only in rd-132328/src/com/mojang/rubydung/level: Tile.java
+Only in rd-160052/src/com/mojang/rubydung: particle
+diff -r rd-132328/src/com/mojang/rubydung/Player.java rd-160052/src/com/mojang/rubydung/Player.java
+39c39
+< 			this.yd = 0.12F;
+---
+> 			this.yd = 0.5F;
+42,43c42,43
+< 		this.moveRelative(xa, ya, this.onGround ? 0.02F : 0.005F);
+< 		this.yd = (float)((double)this.yd - 0.005D);
+---
+> 		this.moveRelative(xa, ya, this.onGround ? 0.1F : 0.02F);
+> 		this.yd = (float)((double)this.yd - 0.08D);
+49,50c49,50
+< 			this.xd *= 0.8F;
+< 			this.zd *= 0.8F;
+---
+> 			this.xd *= 0.7F;
+> 			this.zd *= 0.7F;
+diff -r rd-132328/src/com/mojang/rubydung/RubyDung.java rd-160052/src/com/mojang/rubydung/RubyDung.java
+3d2
+< import com.mojang.rubydung.character.Cube;
+5a5
+> import com.mojang.rubydung.level.Frustum;
+7a8,10
+> import com.mojang.rubydung.level.Tesselator;
+> import com.mojang.rubydung.level.tile.Tile;
+> import com.mojang.rubydung.particle.ParticleEngine;
+19d21
+< import org.lwjgl.opengl.DisplayMode;
+24,329c26,405
+< 
+<     private static final boolean FULLSCREEN_MODE = false;
+<     private int width;
+<     private int height;
+<     private FloatBuffer fogColor = BufferUtils.createFloatBuffer(4);
+<     private Timer timer = new Timer(60.0F);
+<     private Level level;
+<     private LevelRenderer levelRenderer;
+<     private Player player;
+<     private ArrayList<Zombie> zombies = new ArrayList();
+<     private IntBuffer viewportBuffer = BufferUtils.createIntBuffer(16);
+<     private IntBuffer selectBuffer = BufferUtils.createIntBuffer(2000);
+<     private HitResult hitResult = null;
+< 
+<     public void init() throws LWJGLException, IOException {
+<         int col = 920330;
+<         float fr = 0.5F;
+<         float fg = 0.8F;
+<         float fb = 1.0F;
+<         this.fogColor.put(new float[] {
+<             (float) ((col >> 16) & 255) / 255.0F,
+<             (float) ((col >> 8) & 255) / 255.0F,
+<             (float) (col & 255) / 255.0F,
+<             1.0F,
+<         });
+<         this.fogColor.flip();
+<         Display.setDisplayMode(new DisplayMode(1024, 768));
+<         Display.create();
+<         Keyboard.create();
+<         Mouse.create();
+<         this.width = Display.getDisplayMode().getWidth();
+<         this.height = Display.getDisplayMode().getHeight();
+<         GL11.glEnable(GL11.GL_TEXTURE_2D);
+<         GL11.glShadeModel(GL11.GL_SMOOTH);
+<         GL11.glClearColor(fr, fg, fb, 0.0F);
+<         GL11.glClearDepth(1.0D);
+<         GL11.glEnable(GL11.GL_DEPTH_TEST);
+<         GL11.glDepthFunc(GL11.GL_LEQUAL);
+<         GL11.glMatrixMode(GL11.GL_PROJECTION);
+<         GL11.glLoadIdentity();
+<         GL11.glMatrixMode(GL11.GL_MODELVIEW);
+<         this.level = new Level(256, 256, 64);
+<         this.levelRenderer = new LevelRenderer(this.level);
+<         this.player = new Player(this.level);
+<         Mouse.setGrabbed(true);
+< 
+<         for (int i = 0; i < 100; ++i) {
+<             this.zombies.add(new Zombie(this.level, 128.0F, 0.0F, 128.0F));
+<         }
+<     }
+< 
+<     public void destroy() {
+<         this.level.save();
+<         Mouse.destroy();
+<         Keyboard.destroy();
+<         Display.destroy();
+<     }
+< 
+<     public void run() {
+<         try {
+<             this.init();
+<         } catch (Exception var9) {
+<             JOptionPane.showMessageDialog(
+<                 (Component) null,
+<                 var9.toString(),
+<                 "Failed to start RubyDung",
+<                 0
+<             );
+<             System.exit(0);
+<         }
+< 
+<         long lastTime = System.currentTimeMillis();
+<         int frames = 0;
+< 
+<         try {
+<             while (
+<                 !Keyboard.isKeyDown(Keyboard.KEY_ESCAPE) &&
+<                 !Display.isCloseRequested()
+<             ) {
+<                 this.timer.advanceTime();
+< 
+<                 for (int e = 0; e < this.timer.ticks; ++e) {
+<                     this.tick();
+<                 }
+< 
+<                 this.render(this.timer.a);
+<                 ++frames;
+< 
+<                 while (System.currentTimeMillis() >= lastTime + 1000L) {
+<                     System.out.println(frames + " fps, " + Chunk.updates);
+<                     Chunk.updates = 0;
+<                     lastTime += 1000L;
+<                     frames = 0;
+<                 }
+<             }
+<         } catch (Exception var10) {
+<             var10.printStackTrace();
+<         } finally {
+<             this.destroy();
+<         }
+<     }
+< 
+<     public void tick() {
+<         for (int i = 0; i < this.zombies.size(); ++i) {
+<             ((Zombie) this.zombies.get(i)).tick();
+<         }
+< 
+<         this.player.tick();
+<     }
+< 
+<     private void moveCameraToPlayer(float a) {
+<         GL11.glTranslatef(0.0F, 0.0F, -0.3F);
+<         GL11.glRotatef(this.player.xRot, 1.0F, 0.0F, 0.0F);
+<         GL11.glRotatef(this.player.yRot, 0.0F, 1.0F, 0.0F);
+<         float x = this.player.xo + (this.player.x - this.player.xo) * a;
+<         float y = this.player.yo + (this.player.y - this.player.yo) * a;
+<         float z = this.player.zo + (this.player.z - this.player.zo) * a;
+<         GL11.glTranslatef(-x, -y, -z);
+<     }
+< 
+<     private void setupCamera(float a) {
+<         GL11.glMatrixMode(GL11.GL_PROJECTION);
+<         GL11.glLoadIdentity();
+<         GLU.gluPerspective(
+<             70.0F,
+<             (float) this.width / (float) this.height,
+<             0.05F,
+<             1000.0F
+<         );
+<         GL11.glMatrixMode(GL11.GL_MODELVIEW);
+<         GL11.glLoadIdentity();
+<         this.moveCameraToPlayer(a);
+<     }
+< 
+<     private void setupPickCamera(float a, int x, int y) {
+<         GL11.glMatrixMode(GL11.GL_PROJECTION);
+<         GL11.glLoadIdentity();
+<         this.viewportBuffer.clear();
+<         GL11.glGetInteger(GL11.GL_VIEWPORT, this.viewportBuffer);
+<         this.viewportBuffer.flip();
+<         this.viewportBuffer.limit(16);
+<         GLU.gluPickMatrix(
+<             (float) x,
+<             (float) y,
+<             5.0F,
+<             5.0F,
+<             this.viewportBuffer
+<         );
+<         GLU.gluPerspective(
+<             70.0F,
+<             (float) this.width / (float) this.height,
+<             0.05F,
+<             1000.0F
+<         );
+<         GL11.glMatrixMode(GL11.GL_MODELVIEW);
+<         GL11.glLoadIdentity();
+<         this.moveCameraToPlayer(a);
+<     }
+< 
+<     private void pick(float a) {
+<         this.selectBuffer.clear();
+<         GL11.glSelectBuffer(this.selectBuffer);
+<         GL11.glRenderMode(GL11.GL_SELECT);
+<         this.setupPickCamera(a, this.width / 2, this.height / 2);
+<         this.levelRenderer.pick(this.player);
+<         int hits = GL11.glRenderMode(GL11.GL_RENDER);
+<         this.selectBuffer.flip();
+<         this.selectBuffer.limit(this.selectBuffer.capacity());
+<         long closest = 0L;
+<         int[] names = new int[10];
+<         int hitNameCount = 0;
+< 
+<         for (int i = 0; i < hits; ++i) {
+<             int nameCount = this.selectBuffer.get();
+<             long minZ = (long) this.selectBuffer.get();
+<             this.selectBuffer.get();
+<             int j;
+<             if (minZ >= closest && i != 0) {
+<                 for (j = 0; j < nameCount; ++j) {
+<                     this.selectBuffer.get();
+<                 }
+<             } else {
+<                 closest = minZ;
+<                 hitNameCount = nameCount;
+< 
+<                 for (j = 0; j < nameCount; ++j) {
+<                     names[j] = this.selectBuffer.get();
+<                 }
+<             }
+<         }
+< 
+<         if (hitNameCount > 0) {
+<             this.hitResult = new HitResult(
+<                 names[0],
+<                 names[1],
+<                 names[2],
+<                 names[3],
+<                 names[4]
+<             );
+<         } else {
+<             this.hitResult = null;
+<         }
+<     }
+< 
+<     public void render(float a) {
+<         float xo = (float) Mouse.getDX();
+<         float yo = (float) Mouse.getDY();
+<         this.player.turn(xo, yo);
+<         this.pick(a);
+< 
+<         int i;
+<         while (Mouse.next()) {
+<             if (
+<                 Mouse.getEventButton() == 1 &&
+<                 Mouse.getEventButtonState() &&
+<                 this.hitResult != null
+<             ) {
+<                 this.level.setTile(
+<                     this.hitResult.x,
+<                     this.hitResult.y,
+<                     this.hitResult.z,
+<                     0
+<                 );
+<             }
+< 
+<             if (
+<                 Mouse.getEventButton() == 0 &&
+<                 Mouse.getEventButtonState() &&
+<                 this.hitResult != null
+<             ) {
+<                 i = this.hitResult.x;
+<                 int y = this.hitResult.y;
+<                 int z = this.hitResult.z;
+<                 if (this.hitResult.f == 0) {
+<                     --y;
+<                 }
+< 
+<                 if (this.hitResult.f == 1) {
+<                     ++y;
+<                 }
+< 
+<                 if (this.hitResult.f == 2) {
+<                     --z;
+<                 }
+< 
+<                 if (this.hitResult.f == 3) {
+<                     ++z;
+<                 }
+< 
+<                 if (this.hitResult.f == 4) {
+<                     --i;
+<                 }
+< 
+<                 if (this.hitResult.f == 5) {
+<                     ++i;
+<                 }
+< 
+<                 this.level.setTile(i, y, z, 1);
+<             }
+<         }
+< 
+<         while (Keyboard.next()) {
+<             if (
+<                 Keyboard.getEventKey() == Keyboard.KEY_RETURN &&
+<                 Keyboard.getEventKeyState()
+<             ) {
+<                 this.level.save();
+<             }
+<         }
+< 
+<         GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT | GL11.GL_COLOR_BUFFER_BIT);
+<         this.setupCamera(a);
+<         GL11.glEnable(GL11.GL_CULL_FACE);
+<         GL11.glEnable(GL11.GL_FOG);
+<         GL11.glFogi(GL11.GL_FOG_MODE, GL11.GL_EXP);
+<         GL11.glFogf(GL11.GL_FOG_DENSITY, 0.2F);
+<         GL11.glFog(GL11.GL_FOG_COLOR, this.fogColor);
+<         GL11.glDisable(GL11.GL_FOG);
+<         this.levelRenderer.render(this.player, 0);
+< 
+<         for (i = 0; i < this.zombies.size(); ++i) {
+<             ((Zombie) this.zombies.get(i)).render(a);
+<         }
+< 
+<         GL11.glEnable(GL11.GL_FOG);
+<         this.levelRenderer.render(this.player, 1);
+<         GL11.glDisable(GL11.GL_TEXTURE_2D);
+<         if (this.hitResult != null) {
+<             this.levelRenderer.renderHit(this.hitResult);
+<         }
+< 
+<         new Cube(0, 0);
+<         GL11.glDisable(GL11.GL_FOG);
+<         Display.update();
+<     }
+< 
+<     public static void checkError() {
+<         int e = GL11.glGetError();
+<         if (e != 0) {
+<             throw new IllegalStateException(GLU.gluErrorString(e));
+<         }
+<     }
+< 
+<     public static void main(String[] args) throws LWJGLException {
+<         (new Thread(new RubyDung())).start();
+<     }
+---
+> 	private static final boolean FULLSCREEN_MODE = true;
+> 	private int width;
+> 	private int height;
+> 	private FloatBuffer fogColor0 = BufferUtils.createFloatBuffer(4);
+> 	private FloatBuffer fogColor1 = BufferUtils.createFloatBuffer(4);
+> 	private Timer timer = new Timer(20.0F);
+> 	private Level level;
+> 	private LevelRenderer levelRenderer;
+> 	private Player player;
+> 	private int paintTexture = 1;
+> 	private ParticleEngine particleEngine;
+> 	private ArrayList<Zombie> zombies = new ArrayList();
+> 	private IntBuffer viewportBuffer = BufferUtils.createIntBuffer(16);
+> 	private IntBuffer selectBuffer = BufferUtils.createIntBuffer(2000);
+> 	private HitResult hitResult = null;
+> 	FloatBuffer lb = BufferUtils.createFloatBuffer(16);
+> 
+> 	public void init() throws LWJGLException, IOException {
+> 		int col0 = 16710650;
+> 		int col1 = 920330;
+> 		float fr = 0.5F;
+> 		float fg = 0.8F;
+> 		float fb = 1.0F;
+> 		this.fogColor0.put(new float[]{(float)(col0 >> 16 & 255) / 255.0F, (float)(col0 >> 8 & 255) / 255.0F, (float)(col0 & 255) / 255.0F, 1.0F});
+> 		this.fogColor0.flip();
+> 		this.fogColor1.put(new float[]{(float)(col1 >> 16 & 255) / 255.0F, (float)(col1 >> 8 & 255) / 255.0F, (float)(col1 & 255) / 255.0F, 1.0F});
+> 		this.fogColor1.flip();
+> 		Display.setFullscreen(true);
+> 		Display.create();
+> 		Keyboard.create();
+> 		Mouse.create();
+> 		this.width = Display.getDisplayMode().getWidth();
+> 		this.height = Display.getDisplayMode().getHeight();
+> 		GL11.glEnable(GL11.GL_TEXTURE_2D);
+> 		GL11.glShadeModel(GL11.GL_SMOOTH);
+> 		GL11.glClearColor(fr, fg, fb, 0.0F);
+> 		GL11.glClearDepth(1.0D);
+> 		GL11.glEnable(GL11.GL_DEPTH_TEST);
+> 		GL11.glDepthFunc(GL11.GL_LEQUAL);
+> 		GL11.glMatrixMode(GL11.GL_PROJECTION);
+> 		GL11.glLoadIdentity();
+> 		GL11.glMatrixMode(GL11.GL_MODELVIEW);
+> 		this.level = new Level(256, 256, 64);
+> 		this.levelRenderer = new LevelRenderer(this.level);
+> 		this.player = new Player(this.level);
+> 		this.particleEngine = new ParticleEngine(this.level);
+> 		Mouse.setGrabbed(true);
+> 
+> 		for(int i = 0; i < 10; ++i) {
+> 			Zombie zombie = new Zombie(this.level, 128.0F, 0.0F, 128.0F);
+> 			zombie.resetPos();
+> 			this.zombies.add(zombie);
+> 		}
+> 
+> 	}
+> 
+> 	public void destroy() {
+> 		this.level.save();
+> 		Mouse.destroy();
+> 		Keyboard.destroy();
+> 		Display.destroy();
+> 	}
+> 
+> 	public void run() {
+> 		try {
+> 			this.init();
+> 		} catch (Exception var9) {
+> 			JOptionPane.showMessageDialog((Component)null, var9.toString(), "Failed to start RubyDung", 0);
+> 			System.exit(0);
+> 		}
+> 
+> 		long lastTime = System.currentTimeMillis();
+> 		int frames = 0;
+> 
+> 		try {
+> 			while(!Keyboard.isKeyDown(Keyboard.KEY_ESCAPE) && !Display.isCloseRequested()) {
+> 				this.timer.advanceTime();
+> 
+> 				for(int e = 0; e < this.timer.ticks; ++e) {
+> 					this.tick();
+> 				}
+> 
+> 				this.render(this.timer.a);
+> 				++frames;
+> 
+> 				while(System.currentTimeMillis() >= lastTime + 1000L) {
+> 					System.out.println(frames + " fps, " + Chunk.updates);
+> 					Chunk.updates = 0;
+> 					lastTime += 1000L;
+> 					frames = 0;
+> 				}
+> 			}
+> 		} catch (Exception var10) {
+> 			var10.printStackTrace();
+> 		} finally {
+> 			this.destroy();
+> 		}
+> 
+> 	}
+> 
+> 	public void tick() {
+> 		while(Keyboard.next()) {
+> 			if(Keyboard.getEventKeyState()) {
+> 				if(Keyboard.getEventKey() == Keyboard.KEY_RETURN) {
+> 					this.level.save();
+> 				}
+> 
+> 				if(Keyboard.getEventKey() == Keyboard.KEY_1) {
+> 					this.paintTexture = 1;
+> 				}
+> 
+> 				if(Keyboard.getEventKey() == Keyboard.KEY_2) {
+> 					this.paintTexture = 3;
+> 				}
+> 
+> 				if(Keyboard.getEventKey() == Keyboard.KEY_3) {
+> 					this.paintTexture = 4;
+> 				}
+> 
+> 				if(Keyboard.getEventKey() == Keyboard.KEY_4) {
+> 					this.paintTexture = 5;
+> 				}
+> 
+> 				if(Keyboard.getEventKey() == Keyboard.KEY_G) {
+> 					this.zombies.add(new Zombie(this.level, this.player.x, this.player.y, this.player.z));
+> 				}
+> 			}
+> 		}
+> 
+> 		this.level.tick();
+> 		this.particleEngine.tick();
+> 
+> 		for(int i = 0; i < this.zombies.size(); ++i) {
+> 			((Zombie)this.zombies.get(i)).tick();
+> 			if(((Zombie)this.zombies.get(i)).removed) {
+> 				this.zombies.remove(i--);
+> 			}
+> 		}
+> 
+> 		this.player.tick();
+> 	}
+> 
+> 	private void moveCameraToPlayer(float a) {
+> 		GL11.glTranslatef(0.0F, 0.0F, -0.3F);
+> 		GL11.glRotatef(this.player.xRot, 1.0F, 0.0F, 0.0F);
+> 		GL11.glRotatef(this.player.yRot, 0.0F, 1.0F, 0.0F);
+> 		float x = this.player.xo + (this.player.x - this.player.xo) * a;
+> 		float y = this.player.yo + (this.player.y - this.player.yo) * a;
+> 		float z = this.player.zo + (this.player.z - this.player.zo) * a;
+> 		GL11.glTranslatef(-x, -y, -z);
+> 	}
+> 
+> 	private void setupCamera(float a) {
+> 		GL11.glMatrixMode(GL11.GL_PROJECTION);
+> 		GL11.glLoadIdentity();
+> 		GLU.gluPerspective(70.0F, (float)this.width / (float)this.height, 0.05F, 1000.0F);
+> 		GL11.glMatrixMode(GL11.GL_MODELVIEW);
+> 		GL11.glLoadIdentity();
+> 		this.moveCameraToPlayer(a);
+> 	}
+> 
+> 	private void setupOrthoCamera() {
+> 		GL11.glMatrixMode(GL11.GL_PROJECTION);
+> 		GL11.glLoadIdentity();
+> 		GL11.glOrtho(0.0D, (double)this.width, (double)this.height, 0.0D, 100.0D, 300.0D);
+> 		GL11.glMatrixMode(GL11.GL_MODELVIEW);
+> 		GL11.glLoadIdentity();
+> 		GL11.glTranslatef(0.0F, 0.0F, -200.0F);
+> 	}
+> 
+> 	private void setupPickCamera(float a, int x, int y) {
+> 		GL11.glMatrixMode(GL11.GL_PROJECTION);
+> 		GL11.glLoadIdentity();
+> 		this.viewportBuffer.clear();
+> 		GL11.glGetInteger(GL11.GL_VIEWPORT, this.viewportBuffer);
+> 		this.viewportBuffer.flip();
+> 		this.viewportBuffer.limit(16);
+> 		GLU.gluPickMatrix((float)x, (float)y, 5.0F, 5.0F, this.viewportBuffer);
+> 		GLU.gluPerspective(70.0F, (float)this.width / (float)this.height, 0.05F, 1000.0F);
+> 		GL11.glMatrixMode(GL11.GL_MODELVIEW);
+> 		GL11.glLoadIdentity();
+> 		this.moveCameraToPlayer(a);
+> 	}
+> 
+> 	private void pick(float a) {
+> 		this.selectBuffer.clear();
+> 		GL11.glSelectBuffer(this.selectBuffer);
+> 		GL11.glRenderMode(GL11.GL_SELECT);
+> 		this.setupPickCamera(a, this.width / 2, this.height / 2);
+> 		this.levelRenderer.pick(this.player);
+> 		int hits = GL11.glRenderMode(GL11.GL_RENDER);
+> 		this.selectBuffer.flip();
+> 		this.selectBuffer.limit(this.selectBuffer.capacity());
+> 		long closest = 0L;
+> 		int[] names = new int[10];
+> 		int hitNameCount = 0;
+> 
+> 		for(int i = 0; i < hits; ++i) {
+> 			int nameCount = this.selectBuffer.get();
+> 			long minZ = (long)this.selectBuffer.get();
+> 			this.selectBuffer.get();
+> 			int j;
+> 			if(minZ >= closest && i != 0) {
+> 				for(j = 0; j < nameCount; ++j) {
+> 					this.selectBuffer.get();
+> 				}
+> 			} else {
+> 				closest = minZ;
+> 				hitNameCount = nameCount;
+> 
+> 				for(j = 0; j < nameCount; ++j) {
+> 					names[j] = this.selectBuffer.get();
+> 				}
+> 			}
+> 		}
+> 
+> 		if(hitNameCount > 0) {
+> 			this.hitResult = new HitResult(names[0], names[1], names[2], names[3], names[4]);
+> 		} else {
+> 			this.hitResult = null;
+> 		}
+> 
+> 	}
+> 
+> 	public void render(float a) {
+> 		float xo = (float)Mouse.getDX();
+> 		float yo = (float)Mouse.getDY();
+> 		this.player.turn(xo, yo);
+> 		this.pick(a);
+> 
+> 		int var8;
+> 		while(Mouse.next()) {
+> 			if(Mouse.getEventButton() == 1 && Mouse.getEventButtonState() && this.hitResult != null) {
+> 				Tile frustum = Tile.tiles[this.level.getTile(this.hitResult.x, this.hitResult.y, this.hitResult.z)];
+> 				boolean i = this.level.setTile(this.hitResult.x, this.hitResult.y, this.hitResult.z, 0);
+> 				if(frustum != null && i) {
+> 					frustum.destroy(this.level, this.hitResult.x, this.hitResult.y, this.hitResult.z, this.particleEngine);
+> 				}
+> 			}
+> 
+> 			if(Mouse.getEventButton() == 0 && Mouse.getEventButtonState() && this.hitResult != null) {
+> 				int var7 = this.hitResult.x;
+> 				var8 = this.hitResult.y;
+> 				int zombie = this.hitResult.z;
+> 				if(this.hitResult.f == 0) {
+> 					--var8;
+> 				}
+> 
+> 				if(this.hitResult.f == 1) {
+> 					++var8;
+> 				}
+> 
+> 				if(this.hitResult.f == 2) {
+> 					--zombie;
+> 				}
+> 
+> 				if(this.hitResult.f == 3) {
+> 					++zombie;
+> 				}
+> 
+> 				if(this.hitResult.f == 4) {
+> 					--var7;
+> 				}
+> 
+> 				if(this.hitResult.f == 5) {
+> 					++var7;
+> 				}
+> 
+> 				this.level.setTile(var7, var8, zombie, this.paintTexture);
+> 			}
+> 		}
+> 
+> 		GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT | GL11.GL_COLOR_BUFFER_BIT);
+> 		this.setupCamera(a);
+> 		GL11.glEnable(GL11.GL_CULL_FACE);
+> 		Frustum var9 = Frustum.getFrustum();
+> 		this.levelRenderer.updateDirtyChunks(this.player);
+> 		this.setupFog(0);
+> 		GL11.glEnable(GL11.GL_FOG);
+> 		this.levelRenderer.render(this.player, 0);
+> 
+> 		Zombie var10;
+> 		for(var8 = 0; var8 < this.zombies.size(); ++var8) {
+> 			var10 = (Zombie)this.zombies.get(var8);
+> 			if(var10.isLit() && var9.isVisible(var10.bb)) {
+> 				((Zombie)this.zombies.get(var8)).render(a);
+> 			}
+> 		}
+> 
+> 		this.particleEngine.render(this.player, a, 0);
+> 		this.setupFog(1);
+> 		this.levelRenderer.render(this.player, 1);
+> 
+> 		for(var8 = 0; var8 < this.zombies.size(); ++var8) {
+> 			var10 = (Zombie)this.zombies.get(var8);
+> 			if(!var10.isLit() && var9.isVisible(var10.bb)) {
+> 				((Zombie)this.zombies.get(var8)).render(a);
+> 			}
+> 		}
+> 
+> 		this.particleEngine.render(this.player, a, 1);
+> 		GL11.glDisable(GL11.GL_LIGHTING);
+> 		GL11.glDisable(GL11.GL_TEXTURE_2D);
+> 		GL11.glDisable(GL11.GL_FOG);
+> 		if(this.hitResult != null) {
+> 			this.levelRenderer.renderHit(this.hitResult);
+> 		}
+> 
+> 		this.drawGui(a);
+> 		Display.update();
+> 	}
+> 
+> 	private void drawGui(float a) {
+> 		GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+> 		this.setupOrthoCamera();
+> 		GL11.glPushMatrix();
+> 		GL11.glTranslatef((float)(this.width - 48), 48.0F, 0.0F);
+> 		Tesselator t = Tesselator.instance;
+> 		GL11.glScalef(48.0F, 48.0F, 48.0F);
+> 		GL11.glRotatef(30.0F, 1.0F, 0.0F, 0.0F);
+> 		GL11.glRotatef(45.0F, 0.0F, 1.0F, 0.0F);
+> 		GL11.glTranslatef(1.5F, -0.5F, -0.5F);
+> 		int id = Textures.loadTexture("/terrain.png", 9728);
+> 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, id);
+> 		GL11.glEnable(GL11.GL_TEXTURE_2D);
+> 		t.init();
+> 		Tile.tiles[this.paintTexture].render(t, this.level, 0, -2, 0, 0);
+> 		t.flush();
+> 		GL11.glDisable(GL11.GL_TEXTURE_2D);
+> 		GL11.glPopMatrix();
+> 		int wc = this.width / 2;
+> 		int hc = this.height / 2;
+> 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+> 		t.init();
+> 		t.vertex((float)(wc + 1), (float)(hc - 8), 0.0F);
+> 		t.vertex((float)(wc - 0), (float)(hc - 8), 0.0F);
+> 		t.vertex((float)(wc - 0), (float)(hc + 9), 0.0F);
+> 		t.vertex((float)(wc + 1), (float)(hc + 9), 0.0F);
+> 		t.vertex((float)(wc + 9), (float)(hc - 0), 0.0F);
+> 		t.vertex((float)(wc - 8), (float)(hc - 0), 0.0F);
+> 		t.vertex((float)(wc - 8), (float)(hc + 1), 0.0F);
+> 		t.vertex((float)(wc + 9), (float)(hc + 1), 0.0F);
+> 		t.flush();
+> 	}
+> 
+> 	private void setupFog(int i) {
+> 		if(i == 0) {
+> 			GL11.glFogi(GL11.GL_FOG_MODE, GL11.GL_EXP);
+> 			GL11.glFogf(GL11.GL_FOG_DENSITY, 0.001F);
+> 			GL11.glFog(GL11.GL_FOG_COLOR, this.fogColor0);
+> 			GL11.glDisable(GL11.GL_LIGHTING);
+> 		} else if(i == 1) {
+> 			GL11.glFogi(GL11.GL_FOG_MODE, GL11.GL_EXP);
+> 			GL11.glFogf(GL11.GL_FOG_DENSITY, 0.06F);
+> 			GL11.glFog(GL11.GL_FOG_COLOR, this.fogColor1);
+> 			GL11.glEnable(GL11.GL_LIGHTING);
+> 			GL11.glEnable(GL11.GL_COLOR_MATERIAL);
+> 			float br = 0.6F;
+> 			GL11.glLightModel(GL11.GL_LIGHT_MODEL_AMBIENT, this.getBuffer(br, br, br, 1.0F));
+> 		}
+> 
+> 	}
+> 
+> 	private FloatBuffer getBuffer(float a, float b, float c, float d) {
+> 		this.lb.clear();
+> 		this.lb.put(a).put(b).put(c).put(d);
+> 		this.lb.flip();
+> 		return this.lb;
+> 	}
+> 
+> 	public static void checkError() {
+> 		int e = GL11.glGetError();
+> 		if(e != 0) {
+> 			throw new IllegalStateException(GLU.gluErrorString(e));
+> 		}
+> 	}
+> 
+> 	public static void main(String[] args) throws LWJGLException {
+> 		(new Thread(new RubyDung())).start();
+> 	}
+diff -r rd-132328/src/com/mojang/rubydung/Textures.java rd-160052/src/com/mojang/rubydung/Textures.java
+15d14
+< 	private static int lastId = -9999999;
