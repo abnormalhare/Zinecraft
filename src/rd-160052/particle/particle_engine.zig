@@ -32,7 +32,7 @@ pub const ParticleEngine = struct {
     pub fn tick(self: *ParticleEngine, rand: *std.Random) !void {
         var i: usize = 0;
         while (i < self.particles.items.len) {
-            var p = self.particles.items[i];
+            var p = &self.particles.items[i];
             try p.tick(self.alloc, rand);
             if (p.entity.removed) {
                 _ = self.particles.swapRemove(i);
@@ -56,7 +56,7 @@ pub const ParticleEngine = struct {
         gl.glColor4f(0.8, 0.8, 0.8, 1.0);
         t.init();
 
-        for (self.particles.items) |p| {
+        for (self.particles.items) |*p| {
             if (p.is_lit() ^ (layer == 1)) {
                 p.render(t, a, xa, ya, za);
             }

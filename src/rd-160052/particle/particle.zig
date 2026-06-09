@@ -27,7 +27,7 @@ pub const Particle = struct {
         const yd: f32 = ya + @as(f32, @floatCast(rand.float(f64) * 2.0 - 1.0)) * 0.4;
         const zd: f32 = za + @as(f32, @floatCast(rand.float(f64) * 2.0 - 1.0)) * 0.4;
 
-        const speed: f32 = @as(f32, @floatCast(rand.float(f64) * rand.float(f64) + 1.0)) * 0.15;
+        const speed: f32 = @as(f32, @floatCast(rand.float(f64) + rand.float(f64) + 1.0)) * 0.15;
         const dd: f32 = @floatCast(@sqrt(@as(f64, xd * xd + yd * yd + zd * zd)));
 
         return Particle{
