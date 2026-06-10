@@ -9,6 +9,11 @@ pub fn build(b: *std.Build) void {
     const maybe_version = b.option([]const u8, "version", "What Minecraft version to build (e.g. rd-132211)");
     const version = maybe_version orelse "rd-160052";
 
+    // fullscreen mode
+    const options = b.addOptions();
+    const fullscreen = b.option(bool, "fullscreen", "Whether fullscreen mode is enabled (rd-160052+)");
+    options.addOption(?bool, "fullscreen", fullscreen);
+
     // glfw import
     const zglfw = b.dependency("zglfw", .{
         .target = target,
@@ -39,6 +44,7 @@ pub fn build(b: *std.Build) void {
             .{ .name = "stbi", .module = zstbi.module("root") },
         },
     });
+    minecraft.addOptions("options", options);
 
     // combine into executable
     const exe = b.addExecutable(.{

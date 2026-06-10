@@ -3,6 +3,7 @@ const Io = std.Io;
 const glfw = @import("glfw");
 const gl = @import("gl");
 const stbi = @import("stbi");
+const options = @import("options");
 
 const Cube = @import("character/cube.zig").Cube;
 const Zombie = @import("character/zombie.zig").Zombie;
@@ -21,7 +22,7 @@ const HitResult = @import("hit_result.zig").HitResult;
 const Timer = @import("timer.zig").Timer;
 const Textures = @import("textures.zig");
 
-const FULLSCREEN_MODE: bool = true;
+const FULLSCREEN_MODE: bool = options.fullscreen orelse true;
 
 var width: i32 = undefined;
 var height: i32 = undefined;
@@ -65,15 +66,23 @@ fn glfw_setup(w: i32, h: i32) !void {
     glfw.windowHint(.context_version_major, 1);
     glfw.windowHint(.context_version_minor, 1);
 
-    window = try .create(w, h, "RubyDung", null, null);
+    var monitor: ?*glfw.Monitor = null;
+    width = w;
+    height = h;
+
+    if (FULLSCREEN_MODE) {
+        monitor = glfw.getPrimaryMonitor();
+        const video_mode = try glfw.getVideoMode(monitor.?);
+        width = video_mode.width;
+        height = video_mode.height;
+    }
+
+    window = try .create(width, height, "RubyDung", monitor, null);
 
     glfw.makeContextCurrent(window);
 
     _ = glfw.setMouseButtonCallback(window, mouse_button_callback);
     _ = glfw.setKeyCallback(window, key_callback);
-
-    width = w;
-    height = h;
 }
 
 pub fn init(alloc: std.mem.Allocator, io: std.Io) !void {
