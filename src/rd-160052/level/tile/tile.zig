@@ -238,8 +238,16 @@ pub const Tile = union(enum) {
         _ = self;
     }
 
-    pub fn get_aabb(x: i32, y: i32, z: i32) AABB {
-        return AABB{ .x0 = x, .y0 = y, .z0 = z, .x1 = x + 1, .y1 = y + 1, .z1 = z + 1 };
+    pub fn get_aabb(self: Tile, x: i32, y: i32, z: i32) AABB {
+        _ = self;
+        return AABB{
+            .x0 = @floatFromInt(x),
+            .y0 = @floatFromInt(y),
+            .z0 = @floatFromInt(z),
+            .x1 = @floatFromInt(x + 1),
+            .y1 = @floatFromInt(y + 1),
+            .z1 = @floatFromInt(z + 1),
+        };
     }
 
     pub fn blocks_light(self: Tile) bool {

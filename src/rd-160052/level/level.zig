@@ -272,16 +272,11 @@ pub const Level = struct {
                     const ix: i32 = @intCast(x);
                     const iy: i32 = @intCast(y);
                     const iz: i32 = @intCast(z);
-                    if (self.is_solid_tile(ix, iy, iz)) {
-                        try aABBs.append(alloc, AABB{
-                            .x0 = @floatFromInt(ix),
-                            .y0 = @floatFromInt(iy),
-                            .z0 = @floatFromInt(iz),
-                            .x1 = @floatFromInt(ix + 1),
-                            .y1 = @floatFromInt(iy + 1),
-                            .z1 = @floatFromInt(iz + 1),
-                        });
-                    }
+
+                    const tile = TileFile.tiles[@intCast(self.get_tile(ix, iy, iz))];
+                    if (tile == null) continue;
+
+                    try aABBs.append(alloc, tile.?.get_aabb(ix, iy, iz));
                 }
             }
         }
