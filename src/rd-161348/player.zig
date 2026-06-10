@@ -18,8 +18,8 @@ pub const Player = struct {
         return self;
     }
 
-    fn reset_pos(self: *Player, rand: *std.Random) void {
-        self.entity.reset_pos(rand);
+    pub fn remove(self: *Player) void {
+        self.entity.remove();
     }
 
     pub fn turn(self: *Player, xo: f32, yo: f32) void {
@@ -78,5 +78,13 @@ pub const Player = struct {
 
     pub fn move_relative(self: *Player, xa: f32, za: f32, speed: f32) void {
         self.entity.move_relative(xa, za, speed);
+    }
+
+    pub fn is_lit(self: *Player) bool {
+        return self.entity.is_lit();
+    }
+
+    pub fn render(self: *Player) void {
+        _ = self;
     }
 };
