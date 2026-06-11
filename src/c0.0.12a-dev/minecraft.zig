@@ -212,8 +212,8 @@ pub fn destroy(alloc: std.mem.Allocator) void {
 pub fn run(alloc: std.mem.Allocator, io: std.Io) !void {
     running = true;
 
-    init(alloc, io) catch {
-        std.debug.print("Failed to start Minecraft\n", .{});
+    init(alloc, io) catch |err| {
+        std.debug.print("Failed to start Minecraft\n{any}", .{err});
         std.process.exit(0);
     };
     defer destroy(alloc);
