@@ -216,6 +216,7 @@ pub const Level = struct {
         for (self.level_listeners.items, 0..) |item, idx| {
             if (item.base == level_listener.base) {
                 self.level_listeners.swapRemove(idx);
+                break;
             }
         }
     }
