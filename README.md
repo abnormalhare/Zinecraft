@@ -15,3 +15,4 @@ rd-132211
 rd-132328
 rd-160052
 rd-161348
+c0.0.12-dev (c0.0.11 in launcher) (currently in beta)
