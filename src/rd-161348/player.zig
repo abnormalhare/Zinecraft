@@ -18,6 +18,10 @@ pub const Player = struct {
         return self;
     }
 
+    pub fn reset_pos(self: *Player, rand: *std.Random) void {
+        self.entity.reset_pos(rand);
+    }
+
     pub fn remove(self: *Player) void {
         self.entity.remove();
     }
