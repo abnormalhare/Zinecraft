@@ -68,6 +68,7 @@ var window: *glfw.Window = undefined;
 var cursor: *glfw.Cursor = undefined;
 var y_mouse_axis: i32 = 1;
 
+var prng: std.Random.DefaultPrng = undefined;
 var rand: std.Random = undefined;
 
 var lb: [16]f32 = [_]f32{0} ** 16;
@@ -127,7 +128,7 @@ pub fn init(alloc: std.mem.Allocator, io: std.Io) !void {
         1.0,
     };
 
-    var prng: std.Random.DefaultPrng = .init(@bitCast(std.Io.Clock.now(.real, io).toMilliseconds()));
+    prng = .init(@bitCast(std.Io.Clock.now(.real, io).toMilliseconds()));
     rand = prng.random();
 
     stbi.init(io, alloc);

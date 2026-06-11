@@ -7,7 +7,7 @@ pub fn build(b: *std.Build) void {
 
     // get version from build command (-Dversion=<this>)
     const maybe_version = b.option([]const u8, "version", "What Minecraft version to build (e.g. rd-132211)");
-    const version = maybe_version orelse "c0.0.12-dev";
+    const version = maybe_version orelse "c0.0.12a-dev";
 
     // fullscreen mode
     const options = b.addOptions();
