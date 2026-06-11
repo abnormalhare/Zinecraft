@@ -5,3 +5,4 @@ zig-out/
 level.dat
 *.png
 assets/
+*.gif
