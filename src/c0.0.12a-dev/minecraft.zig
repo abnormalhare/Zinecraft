@@ -28,6 +28,8 @@ const Player = @import("player.zig").Player;
 const HitResult = @import("hit_result.zig").HitResult;
 const Timer = @import("timer.zig").Timer;
 
+pub const MinecraftServer = @import("server/minecraft_server.zig").MinecraftServer;
+
 const VERSION_STRING = "0.0.11a";
 var fullscreen = options.fullscreen orelse false;
 

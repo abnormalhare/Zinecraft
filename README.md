@@ -4,7 +4,7 @@ A direct port of Minecraft from Java to Zig. This project was completely stopped
 ### Usage
 This is intended to have as many Minecraft versions as possible. When building the project, you can choose what Minecraft version you'd like to use like this:
 ```
-zig build -Dversion={version}
+zig build -Dversion=<version> -Dconnection=<client|server> -Dfullscreen=<true|false>
 ```
 
 ### AI Disclaimer
