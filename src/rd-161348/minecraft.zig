@@ -390,9 +390,6 @@ pub fn render(alloc: std.mem.Allocator, io: std.Io, a: f32) !void {
     last_y = y;
     pick(a);
 
-    // mouse and keyboard handled with callbacks
-    glfw.pollEvents();
-
     gl.glClear(gl.GL_DEPTH_BUFFER_BIT | gl.GL_COLOR_BUFFER_BIT);
 
     setup_camera(a);
@@ -438,6 +435,8 @@ pub fn render(alloc: std.mem.Allocator, io: std.Io, a: f32) !void {
 
     try draw_gui(a);
 
+    // mouse and keyboard handled with callbacks
+    glfw.pollEvents();
     glfw.swapBuffers(window);
 }
 

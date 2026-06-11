@@ -376,9 +376,6 @@ fn key_callback(awindow: *glfw.Window, key: glfw.Key, scancode: i32, action: glf
 pub fn tick() !void {
     const alloc = std.heap.page_allocator;
 
-    // mouse and keyboard handled with callbacks
-    glfw.pollEvents();
-
     level.tick();
     try particle_engine.tick();
 
@@ -571,6 +568,8 @@ pub fn render(alloc: std.mem.Allocator, io: std.Io, a: f32) !void {
     try draw_gui(a);
     check_gl_error("Rendered gui");
 
+    // mouse and keyboard handled with callbacks
+    glfw.pollEvents();
     glfw.swapBuffers(window);
 }
 

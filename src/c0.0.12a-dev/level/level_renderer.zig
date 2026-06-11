@@ -215,9 +215,9 @@ pub const LevelRenderer = struct {
                 gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA);
 
                 const curr_time1 = std.Io.Clock.now(.real, self.io).toMilliseconds();
-                const color: f32 = @as(f32, @floatCast(@sin(@as(f64, @floatFromInt(curr_time1))) / 100.0)) * 0.2 + 0.8;
+                const color: f32 = @as(f32, @floatCast(@sin(@as(f64, @floatFromInt(curr_time1)) / 100.0))) * 0.2 + 0.8;
                 const curr_time2 = std.Io.Clock.now(.real, self.io).toMilliseconds();
-                const alpha: f32 = @as(f32, @floatCast(@sin(@as(f64, @floatFromInt(curr_time2))) / 200.0)) * 0.2 + 0.5;
+                const alpha: f32 = @as(f32, @floatCast(@sin(@as(f64, @floatFromInt(curr_time2)) / 200.0))) * 0.2 + 0.5;
                 gl.glColor4f(color, color, color, alpha);
 
                 gl.glEnable(gl.GL_TEXTURE_2D);
